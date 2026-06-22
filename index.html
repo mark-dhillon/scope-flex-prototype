@@ -14,6 +14,7 @@
 --ink-h:#333336;
 --purple-bg:#EAE3F2; --purple-tx:#693FA5;
 --red:#E03D3E; --red-soft:#FBE4E3; --red-tx:#E03D3E;
+--rec:#C75852; --rec-d:#B44A45;
 --green:#0E7B6C; --green-bg:#DDEDEA; --green-tx:#0E7B6C;
 --amber:#D9730B; --amber-bg:#FAEBDD; --amber-tx:#D9730B;
 --ink:#1A1A1A; --ink2:#57575C; --ink3:#9C9CA3;
@@ -67,11 +68,11 @@ svg{display:block;}
 .stage>.main,.stage>.body,.stage>.sup{flex:1;}
 @keyframes rise{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
 
-.strip{display:flex;align-items:center;gap:14px;padding:11px 18px;background:#28282C;border-bottom:1px solid rgba(0,0,0,.12);flex-wrap:wrap;position:relative;}
+.strip{display:flex;align-items:center;gap:14px;padding:11px 18px;background:#363B45;border-bottom:1px solid rgba(0,0,0,.1);flex-wrap:wrap;position:relative;}
 .strip .who{display:flex;align-items:center;gap:9px;font-size:13.5px;color:rgba(255,255,255,.8);}
 .strip .who b{font-weight:600;color:#fff;}
 .strip .tm{font-size:14px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:0;}
-.cbtn{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);color:#fff;display:flex;align-items:center;justify-content:center;transition:.14s var(--ease);}
+.cbtn{height:36px;padding:0 13px;border-radius:9px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);color:#fff;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;transition:.14s var(--ease);}
 .cbtn:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.22);}.cbtn:active{transform:scale(.94);}
 .cbtn.on{background:#fff;color:#28282C;border-color:#fff;}
 .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;}
@@ -118,13 +119,14 @@ svg{display:block;}
 .btn.pri{background:var(--blue);border-color:var(--blue);color:#fff;}
 .btn.pri:hover{background:var(--blue-d);border-color:var(--blue-d);}
 .btn.rec.on{background:var(--red);border-color:var(--red);color:#fff;}
-.recOn{border-color:#f0c4c0;color:var(--red);background:var(--red-soft);}
-.recOn:hover{border-color:var(--red);background:#FCE3E0;}
+.recOn{border-color:var(--rec);color:#fff;background:var(--rec);}
+.recOn:hover{border-color:var(--rec-d);background:var(--rec-d);}
+.recOn .recdot{background:#fff;}
 .recWrap{display:inline-flex;align-items:center;gap:10px;flex-direction:row-reverse;}
 .soundWave{display:inline-flex;align-items:center;gap:3px;height:30px;}
-.sw-bar{display:inline-block;width:3px;border-radius:3px;background:var(--red);height:6px;animation:wave 0.7s ease-in-out infinite alternate;}
+.sw-bar{display:inline-block;width:3px;border-radius:3px;background:var(--rec);height:6px;animation:wave 0.7s ease-in-out infinite alternate;}
 @keyframes wave{0%{height:5px;}25%{height:20px;}50%{height:28px;}75%{height:14px;}100%{height:8px;}}
-.recdot{width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;animation:blip 1.3s var(--ease) infinite;}
+.recdot{width:9px;height:9px;border-radius:50%;background:var(--rec);display:inline-block;animation:blip 1.3s var(--ease) infinite;}
 .rectime{font-variant-numeric:tabular-nums;}
 .body{min-height:0;}
 .body>.rail{overflow-y:auto;min-height:0;}
@@ -504,9 +506,6 @@ body:not(.fx) .fxnote{display:none;}
 .railProg .bar i{display:block;height:100%;border-radius:7px;background:var(--green);transition:width .35s var(--ease);}
 
 /* ── weighty record control ── */
-.recBtn{font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:9px;border:1px solid #E7B9B5;background:var(--red-soft);color:var(--red);display:inline-flex;align-items:center;gap:8px;transition:.14s var(--ease);}
-.recBtn:hover{border-color:var(--red);background:#FCE0DD;}
-.recBtn:active{transform:scale(.98);}
 
 /* ── manager hero metrics ── */
 .heroRow{display:grid;grid-template-columns:1.55fr 1fr;gap:16px;margin-bottom:28px;}
@@ -584,7 +583,8 @@ zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
 external:'<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
 arrowR:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
 clapper:'<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
-barChart:'<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/>'
+barChart:'<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/>',
+download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>'
 };
 function ic(n,s,c){return `<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;}
 function twilioIcon(s){const z=s||16;return `<svg width="${z}" height="${z}" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#F22F46"/><circle cx="11" cy="11" r="2.7" fill="#fff"/><circle cx="21" cy="21" r="2.7" fill="#fff"/><circle cx="21" cy="11" r="2.7" fill="#fff"/><circle cx="11" cy="21" r="2.7" fill="#fff"/></svg>`;}
@@ -747,7 +747,7 @@ function doctag(p){return `<span class="lbl"><span class="ldot doc"></span>${p}<
 function strip(){
 const p=P();
 const calling=S.callStatus==='calling';
-return `<div class="strip fz"><span class="ftag"><span class="tdot"></span>Flex</span>   <span class="who">${ic('phone',16,'rgba(255,255,255,.9)')} <b>${p.nm}</b> &nbsp;·&nbsp; ${p.phone}</span>   <span class="tm" id="callTimer">${fmt(S.callSec)}</span>   <span class="pill ${calling?'calling':'live'}"><span class="pdot"></span>${calling?'Calling…':'Live call'}</span>   <span style="flex:1"></span>   <button class="cbtn ${S.muted?'on':''}" id="mute" aria-label="Mute">${ic(S.muted?'micOff':'mic',17)}</button>   <button class="cbtn ${S.hold?'on':''}" id="hold" aria-label="Hold">${ic('pause',17)}</button>   <button class="cbtn" id="xfer" aria-label="Transfer">${ic('transfer',17)}</button>   <span style="font-size:12.5px;color:rgba(255,255,255,.9);font-weight:500">Amy Luna</span></div>`;
+return `<div class="strip fz"><span class="ftag"><span class="tdot"></span>Flex</span>   <span class="who">${ic('phone',16,'rgba(255,255,255,.9)')} <b>${p.nm}</b> &nbsp;·&nbsp; ${p.phone}</span>   <span class="tm" id="callTimer">${fmt(S.callSec)}</span>   <span class="pill ${calling?'calling':'live'}"><span class="pdot"></span>${calling?'Calling…':'Live call'}</span>   <span style="flex:1"></span>   <button class="cbtn ${S.muted?'on':''}" id="mute">${ic(S.muted?'micOff':'mic',15)} <span>${S.muted?'Unmute':'Mute'}</span></button>   <button class="cbtn ${S.hold?'on':''}" id="hold">${ic('pause',15)} <span>${S.hold?'Resume':'Pause'}</span></button>   <button class="cbtn" id="xfer">${ic('transfer',15)} <span>Transfer</span></button>   <span style="font-size:12.5px;color:rgba(255,255,255,.9);font-weight:500">Amy Luna</span></div>`;
 }
 function startRecTimer(){if(recInt)clearInterval(recInt);recInt=setInterval(()=>{if(!S.recPaused){S.recSec++;const t=document.getElementById('rectime');if(t)t.textContent=fmt(S.recSec);const s=document.getElementById('striprec');if(s)s.textContent=fmt(S.recSec);}},1000);}
 function rail(){
@@ -817,7 +817,7 @@ const p=P();
 const onAppt=S.visitStep==='appt';
 const recUI=S.aiRec
 ?`<div class="recWrap"><button class="btn recOn" id="rec"><span class="recdot"></span> Stop recording</button><span class="soundWave">${Array.from({length:18},(_,i)=>`<span class="sw-bar" style="animation-delay:${(i%6)*0.11}s"></span>`).join('')}</span></div>`
-   :`<button class="recBtn" id="rec">${ic('mic',17)} Record</button>`;   const mainContent=onAppt?apptPanel():questions();   app.innerHTML=`<div class="stage">${strip()}<div class="body">${rail()}<div class="main visitMain">
+   :`<button class="btn" id="rec">${ic('mic',16)} Record</button>`;   const mainContent=onAppt?apptPanel():questions();   app.innerHTML=`<div class="stage">${strip()}<div class="body">${rail()}<div class="main visitMain">
 <div class="phead"><div class="pname"><span class="n">${p.nm}</span><span class="div"></span><span class="m">${p.sex} · ${p.dob} ·${p.age}</span></div>
 <div class="acts">${recUI}<button class="btn" id="end">End visit</button></div></div>
    <div class="vtog" id="visitTabs"><button class="${onAppt?'':'on'}" data-vt="questions">Questions</button><button class="${onAppt?'on':''}" data-vt="appt">Admin</button></div>
@@ -842,11 +842,11 @@ const recUI=S.aiRec
 </div>
 <div class="main"><div class="phead">
 <div class="stab" id="stab"><button class="${S.sumTab==='brief'?'on':''}" data-t="brief">AI brief</button><button class="${S.sumTab==='transcript'?'on':''}" data-t="transcript">Transcript</button></div>
-<div class="acts"><button class="btn" id="print">${ic('printer',16)} Print</button><button class="btn pri" id="return">Return to schedule</button></div></div>${S.sumTab==='brief'?brief:transcript}
+<div class="acts"><button class="btn" id="download">${ic('download',16)} Download</button><button class="btn pri" id="return">Return to schedule</button></div></div>${S.sumTab==='brief'?brief:transcript}
 <div class="note fxnote"><span class="ni">${ic('zap',15)}</span><span>On return, Flex sets you back to Ready and routes the next waiting patient — automatically.</span></div>
 </div></div></div>`;
 document.querySelectorAll('#stab button').forEach(b=>b.onclick=()=>{S.sumTab=b.dataset.t;render();});
-document.getElementById('print').onclick=()=>toast('Sent to print');
+document.getElementById('download').onclick=()=>toast('Downloading brief as PDF');
 document.getElementById('return').onclick=()=>{stop();S.screen='available';S.active=null;S.answered=[];S.aiRec=S.muted=S.hold=S.recPaused=false;S.callStatus='calling';toast('Back on your queue');render();};
 }
 
