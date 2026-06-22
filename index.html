@@ -62,7 +62,8 @@ svg{display:block;}
 
 .appwrap{width:100%;}
 .app{background:var(--white);position:relative;min-height:100dvh;display:flex;flex-direction:column;}
-.stage{animation:rise .26s var(--ease);flex:1;display:flex;flex-direction:column;}
+.stage{flex:1;display:flex;flex-direction:column;}
+.stage.enter{animation:rise .26s var(--ease);}
 .stage>.main,.stage>.body,.stage>.sup{flex:1;}
 @keyframes rise{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
 
@@ -76,8 +77,10 @@ svg{display:block;}
 .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;}
 .pill.avail{background:var(--green-bg);color:var(--green-tx);}
 .pill.oncall{background:rgba(255,255,255,.18);color:#fff;}
+.pill.calling{background:rgba(217,115,11,.20);color:#F5BB55;}
+.pill.live{background:rgba(14,123,108,.24);color:#4FD8A8;}
 .pdot{width:7px;height:7px;border-radius:50%;background:currentColor;}
-.pill.oncall .pdot,.pill.avail .pdot{animation:blip 1.6s var(--ease) infinite;}
+.pill.oncall .pdot,.pill.avail .pdot,.pill.calling .pdot,.pill.live .pdot{animation:blip 1.6s var(--ease) infinite;}
 @keyframes blip{0%,100%{opacity:1;}50%{opacity:.4;}}
 
 .body{display:grid;grid-template-columns:252px 1fr;min-height:580px;}
@@ -118,14 +121,9 @@ svg{display:block;}
 .recOn{border-color:#f0c4c0;color:var(--red);background:var(--red-soft);}
 .recOn:hover{border-color:var(--red);background:#FCE3E0;}
 .recWrap{display:inline-flex;align-items:center;gap:10px;flex-direction:row-reverse;}
-.soundWave{display:inline-flex;align-items:center;gap:3px;height:22px;}
-.sw-bar{display:inline-block;width:3px;border-radius:3px;background:var(--red);height:4px;animation:wave 0.7s ease-in-out infinite alternate;}
-.sw-bar:nth-child(1){animation-delay:0s;}
-.sw-bar:nth-child(2){animation-delay:0.15s;}
-.sw-bar:nth-child(3){animation-delay:0.05s;}
-.sw-bar:nth-child(4){animation-delay:0.2s;}
-.sw-bar:nth-child(5){animation-delay:0.1s;}
-@keyframes wave{0%{height:3px;}25%{height:14px;}50%{height:20px;}75%{height:10px;}100%{height:5px;}}
+.soundWave{display:inline-flex;align-items:center;gap:3px;height:30px;}
+.sw-bar{display:inline-block;width:3px;border-radius:3px;background:var(--red);height:6px;animation:wave 0.7s ease-in-out infinite alternate;}
+@keyframes wave{0%{height:5px;}25%{height:20px;}50%{height:28px;}75%{height:14px;}100%{height:8px;}}
 .recdot{width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;animation:blip 1.3s var(--ease) infinite;}
 .rectime{font-variant-numeric:tabular-nums;}
 .body{min-height:0;}
@@ -164,7 +162,7 @@ svg{display:block;}
 .qtab .c{font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:#E4E4E7;color:var(--ink2);}
 .qtab.on .c{background:var(--ink);color:#fff;}
 /* Notion-database-style view tabs (retrieval) */
-.ntabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin-bottom:18px;flex-wrap:wrap;}
+.ntabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin-bottom:22px;flex-wrap:wrap;}
 .ntabs button{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;color:var(--ink3);padding:0 0 11px;margin-bottom:-1px;border-bottom:2px solid transparent;transition:.14s var(--ease);white-space:nowrap;}
 .ntabs button:hover{color:var(--ink2);}
 .ntabs button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink);}
@@ -216,7 +214,7 @@ svg{display:block;}
 .tag.attempt{background:#EDEDEE;color:var(--ink2);}
 .tag.next{background:var(--ink);color:#fff;}
 
-.greet{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
+.greet{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:30px;}
 .greet h1{font-size:30px;font-weight:700;letter-spacing:-.032em;margin:0;line-height:1.08;}
 .greetEy{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:9px;}
 .greetSub{font-size:14px;color:var(--ink2);margin-top:11px;}
@@ -314,7 +312,7 @@ svg{display:block;}
 .kpi .v{font-size:24px;font-weight:600;margin:6px 0 0;letter-spacing:-.02em;}
 .kpi .hint{font-size:11.5px;color:var(--ink3);margin-top:3px;}
 .srow{display:grid;grid-template-columns:1.35fr 1.15fr;gap:15px;min-height:0;flex:1;}
-.panel{border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-height:0;overflow:hidden;}
+.panel{border:1px solid var(--line);border-radius:14px;padding:20px 20px;min-height:0;overflow:hidden;}
 .panel h4{font-size:13.5px;font-weight:600;margin:0 0 4px;}
 
 .panelHd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;}
@@ -334,7 +332,7 @@ th.num,td.num{text-align:right;}
 .mon:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
 
 .sup{padding:42px 36px 26px;overflow:auto;}
-.supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px;}
 .supGreet{font-size:28px;font-weight:700;letter-spacing:-.03em;margin:0 0 8px;line-height:1.1;}
 .sup .h{font-size:20px;font-weight:600;letter-spacing:-.018em;margin:0 0 4px;}
 .sup .sub{font-size:13.5px;color:var(--ink2);margin:0;line-height:1.45;}
@@ -350,26 +348,26 @@ th.num,td.num{text-align:right;}
 .mktItem.on{background:var(--blue-softer);color:var(--blue-d);font-weight:600;}
 .mktTick{width:14px;height:14px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--blue-d);}
 .mktItem.on .mktTick::after{content:"";width:6px;height:10px;border:solid currentColor;border-width:0 2.2px 2.2px 0;transform:rotate(42deg);margin-top:-2px;}
-.metricRows{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
-.metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.metricLabel{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:0 0 7px;}
+.metricRows{display:flex;flex-direction:column;gap:18px;margin-bottom:28px;}
+.metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.metricLabel{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px;}
 .metric.call{background:#fff;}
-.metric{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:14px 16px;min-height:88px;}
+.metric{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:17px 18px;min-height:96px;}
 .metric .l{font-size:12.5px;color:var(--ink2);margin:0;}
 .metric .v{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:6px 0 0;}
 .metric .hint{font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.35;}
-.supBody{display:flex;flex-direction:column;gap:15px;align-items:stretch;}
-.panelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.supBody{display:flex;flex-direction:column;gap:20px;align-items:stretch;}
+.panelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;}
 .panelHead h4{font-size:13.5px;font-weight:600;margin:0 0 4px;}
 .panelHead .desc{font-size:12px;color:var(--ink3);margin:0;line-height:1.45;}
-.agentTable th,.agentTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:11px 0;vertical-align:middle;}
+.agentTable th,.agentTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:14px 0;vertical-align:middle;}
 .agentTable th{font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;padding-top:0;}
 .agentTable tr:last-child td{border-bottom:0;}
 .callsNum{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;}
 .listenBtn{height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;transition:.14s var(--ease);}
 .listenBtn:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
 .listenBtn[disabled]{opacity:.35;cursor:not-allowed;}
-.queueTable th,.queueTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:14px 0;vertical-align:middle;}
+.queueTable th,.queueTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:17px 0;vertical-align:middle;}
 .queueTable th{font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;padding-top:0;}
 .queueTable tr:last-child td{border-bottom:0;}
 .patientCell{display:flex;align-items:center;gap:10px;min-width:0;}
@@ -382,7 +380,7 @@ th.num,td.num{text-align:right;}
 .startScope.pri:hover{background:var(--blue-d);border-color:var(--blue-d);}
 .waitText{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;}
 .waitText.long{color:var(--amber);}
-.superNote{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:12px;padding:11px 13px;background:var(--surface);border-radius:10px;border:1px solid var(--line);}
+.superNote{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:18px;padding:13px 15px;background:var(--surface);border-radius:10px;border:1px solid var(--line);}
 .mon.big{width:auto;min-width:74px;padding:0 10px;gap:7px;font-size:12.5px;font-weight:500;}
 .cbList{display:flex;flex-direction:column;border-top:1px solid var(--line);}
 .cb{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
@@ -669,15 +667,15 @@ if(r.status==='todo')r.status='contacted';
 if(S.view==='retrieval')render();
 }
 
-let S,callInt=null,recInt=null;
-const fresh=()=>({view:'agent',screen:'available',modal:null,fx:false,qtab:'outbound',status:'Ready',active:null,muted:false,hold:false,aiRec:false,recPaused:false,callSec:0,recSec:0,reason:0,answered:[],sumTab:'brief',appt:null,reschedule:'',recReq:[],rtab:'todo',visitStep:'questions',mktFilter:null});
+let S,callInt=null,recInt=null,callStatusTimer=null,prevView=null;
+const fresh=()=>({view:'agent',screen:'available',modal:null,fx:false,qtab:'outbound',status:'Ready',active:null,muted:false,hold:false,aiRec:false,recPaused:false,callSec:0,recSec:0,callStatus:'calling',reason:0,answered:[],sumTab:'brief',appt:null,reschedule:'',recReq:[],rtab:'todo',visitStep:'questions',mktFilter:null});
 S=fresh();
 const app=document.getElementById('app');
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 function greeting(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening';}
 function todayLabel(){return new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
 function toast(t){const e=document.getElementById('toast');e.innerHTML=ic('zap',16,'#7FB8D6')+'<span>'+t+'</span>';e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200);}
-function stop(){if(callInt){clearInterval(callInt);callInt=null;}if(recInt){clearInterval(recInt);recInt=null;}}
+function stop(){if(callInt){clearInterval(callInt);callInt=null;}if(recInt){clearInterval(recInt);recInt=null;}if(callStatusTimer){clearTimeout(callStatusTimer);callStatusTimer=null;}}
 function runCall(){stop();S.callSec=0;callInt=setInterval(()=>{if(!S.hold){S.callSec++;const t=document.getElementById('callTimer');if(t)t.textContent=fmt(S.callSec);}},1000);}
 const P=()=>S.active||QUEUE[0];
 const lang=s=>s==='es'?'Spanish':'English';
@@ -694,7 +692,8 @@ function doctag(p){return `<span class="lbl"><span class="ldot doc"></span>${p}<
 
 function strip(){
 const p=P();
-return `<div class="strip fz"><span class="ftag"><span class="tdot"></span>Flex</span>   <span class="who">${ic('phone',16,'rgba(255,255,255,.9)')} On call &nbsp;·&nbsp; <b>${p.nm}</b> &nbsp;·&nbsp; ${p.phone}</span>   <span class="tm" id="callTimer">0:00</span>   <span class="recpill" title="Twilio is recording this call"><span class="recdot"></span>Recording <span id="striprec">${fmt(S.recSec)}</span></span>   <span style="flex:1"></span>   <button class="cbtn ${S.muted?'on':''}" id="mute" aria-label="Mute">${ic(S.muted?'micOff':'mic',17)}</button>   <button class="cbtn ${S.hold?'on':''}" id="hold" aria-label="Hold">${ic('pause',17)}</button>   <button class="cbtn" id="xfer" aria-label="Transfer">${ic('transfer',17)}</button>   <span class="pill oncall"><span class="pdot"></span>On call</span>   <span style="font-size:12.5px;color:rgba(255,255,255,.9);font-weight:500">Amy Luna</span></div>`;
+const calling=S.callStatus==='calling';
+return `<div class="strip fz"><span class="ftag"><span class="tdot"></span>Flex</span>   <span class="who">${ic('phone',16,'rgba(255,255,255,.9)')} <b>${p.nm}</b> &nbsp;·&nbsp; ${p.phone}</span>   <span class="tm" id="callTimer">${fmt(S.callSec)}</span>   <span class="pill ${calling?'calling':'live'}"><span class="pdot"></span>${calling?'Calling…':'Live call'}</span>   <span style="flex:1"></span>   <button class="cbtn ${S.muted?'on':''}" id="mute" aria-label="Mute">${ic(S.muted?'micOff':'mic',17)}</button>   <button class="cbtn ${S.hold?'on':''}" id="hold" aria-label="Hold">${ic('pause',17)}</button>   <button class="cbtn" id="xfer" aria-label="Transfer">${ic('transfer',17)}</button>   <span style="font-size:12.5px;color:rgba(255,255,255,.9);font-weight:500">Amy Luna</span></div>`;
 }
 function startRecTimer(){if(recInt)clearInterval(recInt);recInt=setInterval(()=>{if(!S.recPaused){S.recSec++;const t=document.getElementById('rectime');if(t)t.textContent=fmt(S.recSec);const s=document.getElementById('striprec');if(s)s.textContent=fmt(S.recSec);}},1000);}
 function rail(){
@@ -760,7 +759,7 @@ else if(S.screen==='inVisit'){
 const p=P();
 const onAppt=S.visitStep==='appt';
 const recUI=S.aiRec
-?`<div class="recWrap"><button class="btn recOn" id="rec"><span class="recdot"></span> Stop recording</button><span class="soundWave">${Array.from({length:5},(_,i)=>`<span class="sw-bar" style="animation-delay:${i*0.1}s"></span>`).join('')}</span></div>`
+?`<div class="recWrap"><button class="btn recOn" id="rec"><span class="recdot"></span> Stop recording</button><span class="soundWave">${Array.from({length:18},(_,i)=>`<span class="sw-bar" style="animation-delay:${(i%6)*0.11}s"></span>`).join('')}</span></div>`
    :`<button class="btn" id="rec">${ic('mic',16)} Record</button>`;   const mainContent=onAppt?apptPanel():questions();   app.innerHTML=`<div class="stage">${strip()}<div class="body">${rail()}<div class="main visitMain">
 <div class="phead"><div class="pname"><span class="n">${p.nm}</span><span class="div"></span><span class="m">${p.sex} · ${p.dob} ·${p.age}</span></div>
 <div class="acts">${recUI}<button class="btn" id="end">End visit</button></div></div>
@@ -791,13 +790,13 @@ const recUI=S.aiRec
 </div></div></div>`;
 document.querySelectorAll('#stab button').forEach(b=>b.onclick=()=>{S.sumTab=b.dataset.t;render();});
 document.getElementById('print').onclick=()=>toast('Sent to print');
-document.getElementById('return').onclick=()=>{stop();S.screen='available';S.active=null;S.answered=[];S.aiRec=S.muted=S.hold=S.recPaused=false;toast('Back on your queue');render();};
+document.getElementById('return').onclick=()=>{stop();S.screen='available';S.active=null;S.answered=[];S.aiRec=S.muted=S.hold=S.recPaused=false;S.callStatus='calling';toast('Back on your queue');render();};
 }
 
 if(S.screen==='startVisit'){
 const p=P();
 app.insertAdjacentHTML('beforeend',`<div class="scrim"><div class="modal">    <h2>Start new visit</h2><p class="lead">Verify patient details to start your Scope visit</p>    <div class="prev"><div><div class="l">Previous note</div><div class="s">August 5, 2025 · Signed by Dr. Alla</div></div><div class="chk">${ic('check',14)}</div></div>    <div class="note fxnote" style="margin:0 0 16px"><span class="ni">${ic('zap',15)}</span><span>Patient, phone and provider are pre-filled from the queue — the agent doesn't type anything.</span></div>    <div class="grid2">     <div class="fld"><label>Patient</label><div class="v ro">${p.nm}</div></div>     <div class="fld"><label>Phone number</label><div class="v ro">${p.phone}</div></div>     <div class="fld"><label>Sex</label><div class="v">${p.sex} ${ic('chevDown',16)}</div></div>     <div class="fld"><label>Date of birth</label><div class="v">${p.dob} ${ic('calendar',16)}</div></div>     <div class="fld"><label>Provider</label><div class="v">${p.prov} ${ic('chevDown',16)}</div></div>     <div class="fld"><label>Visit type</label><div class="v">${p.type} — Consult ${ic('chevDown',16)}</div></div></div>    <div class="mact"><button class="btn" id="back">Back to schedule</button><button class="btn pri" id="start">Start visit</button></div></div></div>`);
-document.getElementById('start').onclick=()=>{S.screen='inVisit';S.visitStep='questions';S.appt=null;S.reschedule='';S.recReq=avsRecords().map(r=>({...r,status:'pending'}));S.aiRec=false;S.recSec=0;render();runCall();startRecTimer();};
+document.getElementById('start').onclick=()=>{S.screen='inVisit';S.visitStep='questions';S.appt=null;S.reschedule='';S.recReq=avsRecords().map(r=>({...r,status:'pending'}));S.aiRec=false;S.callSec=0;S.callStatus='calling';render();stop();callStatusTimer=setTimeout(()=>{S.callStatus='live';runCall();render();},1600);};
 document.getElementById('back').onclick=()=>{S.screen='available';render();};
 }
 if(S.modal==='endVisit'){
@@ -835,15 +834,15 @@ app.innerHTML=`<div class="stage"><div class="sup fz"><span class="ftag block"><
 <td><span class="callsNum">${a.calls}</span></td>
      <td><span class="callsNum">${a.visits}</span></td>
 <td><span class="callsNum" style="${convColor(p)}">${p}%</span></td>
-<td style="text-align:right">${a.code==='oncall'?`<button class="listenBtn" data-a="Listening to${a.name.split(' ')[0]}'s call">${ic('headphones',15)} Listen</button>`:`<button class="listenBtn" disabled>${ic('headphones',15)} Listen</button>`}</td></tr>`;}).join('')}
+<td style="text-align:right">${a.code==='oncall'?`<button class="listenBtn" data-a="Listening to ${a.name.split(' ')[0]}'s call">${ic('headphones',15)} Listen</button>`:`<button class="listenBtn" disabled>${ic('headphones',15)} Listen</button>`}</td></tr>`;}).join('')}
 </tbody></table>
 </div>
 <div class="panel"><div class="panelHead"><div><h4>Inbound call queue</h4><p class="desc">Separate from agent state. This is only the live list of patients waiting for an inbound call to be answered.</p></div></div>
 <table class="queueTable"><thead><tr><th>Patient</th><th>Wait</th><th>Language</th><th style="text-align:right">Action</th></tr></thead><tbody>
 ${W.map((w,i)=>{const urgent=isUrgentWait(w.wait);return `<tr><td><div class="patientCell">${avatar(w.nm,34)}<div><div class="name">${w.nm}</div><div class="under">${w.prov} · ${w.type}</div></div></div></td>
-      <td><span class="waitText${urgent?'long':''}">${w.wait}</span>${urgent?'<div style="margin-top:4px"><span class="tag urgent">Urgent</span></div>':''}</td>
+      <td><span class="waitText ${urgent?'long':''}">${w.wait}</span>${urgent?'<div style="margin-top:4px"><span class="tag urgent">Urgent</span></div>':''}</td>
 <td>${w.skill==='es'?spanishBadge(w.skill):'<span class="meta">English</span>'}</td>
-      <td style="text-align:right"><button class="startScope${urgent?'pri':''}" data-start="${i}">${ic('phoneIn',14)} Start Scope</button></td></tr>`;}).join('')}     </tbody></table>     <div class="superNote">Urgent is automatic after 2:00 waiting. I kept this queue below the agent table so it doesn't mix with Ready / On call / On break.</div>    </div>   </div></div></div>`;
+      <td style="text-align:right"><button class="startScope ${urgent?'pri':''}" data-start="${i}">${ic('phoneIn',14)} Start Scope</button></td></tr>`;}).join('')}     </tbody></table>     <div class="superNote">Urgent is automatic after 2:00 waiting. I kept this queue below the agent table so it doesn't mix with Ready / On call / On break.</div>    </div>   </div></div></div>`;
 document.getElementById('sigmaBtn').onclick=()=>{toast('Opening analytics in Sigma');window.open('https://app.sigmacomputing.com/','_blank','noopener');};
 document.getElementById('recordingsBtn').onclick=()=>{toast('Opening call recordings in Twilio');window.open('https://console.twilio.com/','_blank','noopener');};
 const MARKETS=['All agents','Pomona','Rhode Island','Safety Net'];
@@ -869,7 +868,7 @@ const statusSel=r=>`<select class="statusSel s-${r.status}" data-status="${r.id}
    const c=contactInfo(r);
    let sub='';
    if(r.status==='received')sub=`<div class="rtSub">Filed to chart${r.done?' · '+r.done:''}</div>`;    else if(r.status==='unsuccessful')sub=`<div class="rtSub">${r.reason||'Unable to obtain'}</div>`;
-   else if(r.lastContact)sub=`<div class="rtSub">Last contact${r.lastContact}${r.attempts?' · '+r.attempts+' attempt'+(r.attempts>1?'s':''):''}</div>`;
+   else if(r.lastContact)sub=`<div class="rtSub">Last contact ${r.lastContact}${r.attempts?' · '+r.attempts+' attempt'+(r.attempts>1?'s':''):''}</div>`;
    const srcCell=`<div class="rtSrcName">${r.source}</div><div class="rtContact"><span class="methodTag ${c.cls}">${ic(c.icon,11)} ${c.tag}</span><span>${c.line}</span></div>${sub}`;
    const action=r.status==='received'?`<span class="rtDone">${ic('check',14)} Filed</span>`:`<button class="goBtn" data-contact="${r.id}">${ic(c.icon,13)} ${c.label}</button>`;
    return `<tr><td>${cell(r)}</td><td>${srcCell}</td><td>${statusSel(r)}</td><td><div class="rtActs">${action}</div></td></tr>`;
@@ -899,7 +898,10 @@ document.querySelectorAll('.statusSel').forEach(sel=>sel.onchange=()=>{const r=R
 
 function render(){
 document.body.classList.toggle('fx',S.fx);
+const viewChanged=S.view!==prevView;
 if(S.view==='agent')agent();else if(S.view==='supervisor')supervisor();else retrieval();
+if(viewChanged){const st=app.querySelector('.stage');if(st)st.classList.add('enter');}
+prevView=S.view;
 }
 const VIEW_LABELS={agent:'Agent',supervisor:'Manager',retrieval:'Retrieval'};
 const viewFab=document.getElementById('viewFab'),viewMenu=document.getElementById('viewMenu'),viewScrim=document.getElementById('viewScrim');
