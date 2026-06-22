@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scope + Flex — Call Team Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2563EB; --blue-d:#1D4ED8; --blue-soft:#EEF3FE; --blue-softer:#F5F8FF;
+    --chip-bg:#EAF1FE; --chip-tx:#1D4ED8;
+    --purple-bg:#F0EAFE; --purple-tx:#6321b0;
+    --red:#E1473D; --red-soft:#FDEEEC; --red-tx:#B5362C;
+    --green:#16A34A; --green-bg:#E7F6EC; --green-tx:#157F3C;
+    --amber:#D97706; --amber-bg:#FBF0DD; --amber-tx:#92590B;
+    --ink:#15181E; --ink2:#5B616E; --ink3:#9298A4;
+    --line:rgba(20,23,28,.09); --line2:rgba(20,23,28,.14);
+    --surface:#FAFBFC; --white:#fff; --page:#F4F5F7;
+    --r-lg:16px; --r-md:11px; --r-sm:8px;
+    --ease:cubic-bezier(.32,.72,.35,1);
+    --shadow:0 1px 3px rgba(20,23,28,.06);
+    --shadow-pop:0 12px 40px rgba(20,23,28,.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--ink);background:var(--page);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-.006em;}
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit;}
+  svg{display:block;}
+  ::selection{background:#cfe0fd;}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 18px 56px;}
+
+  .harness{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;padding:0 2px;}
+  .harness .ey{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);}
+  .harness .ttl{font-size:14px;font-weight:600;}
+  .harness .spacer{flex:1;}
+  .seg{display:inline-flex;background:#EAEBEE;border-radius:9px;padding:3px;gap:2px;}
+  .seg button{font-size:13px;font-weight:500;padding:6px 14px;border-radius:7px;color:var(--ink2);transition:.16s var(--ease);}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,23,28,.08);}
+  .tog{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:450;color:var(--ink2);}
+  .sw{width:38px;height:22px;border-radius:20px;background:#CDD0D6;position:relative;transition:.18s var(--ease);}
+  .sw.on{background:var(--blue);}
+  .sw i{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.18s var(--ease);box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  .sw.on i{left:18px;}
+  .reset{font-size:13px;font-weight:450;color:var(--ink2);padding:6px 12px;border-radius:8px;transition:.15s var(--ease);}
+  .reset:hover{background:#EAEBEE;color:var(--ink);}
+
+  .app{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:calc(100dvh - 140px);display:flex;flex-direction:column;}
+  .stage{animation:rise .26s var(--ease);flex:1;display:flex;flex-direction:column;}
+  .stage>.main,.stage>.body,.stage>.sup{flex:1;}
+  @keyframes rise{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+  .strip{display:flex;align-items:center;gap:14px;padding:11px 18px;background:var(--blue-softer);border-bottom:1px solid var(--line);flex-wrap:wrap;position:relative;}
+  .strip .who{display:flex;align-items:center;gap:9px;font-size:13.5px;color:#1B3F8F;}
+  .strip .who b{font-weight:600;color:#14306e;}
+  .strip .tm{font-size:14px;font-weight:600;color:#14306e;font-variant-numeric:tabular-nums;letter-spacing:0;}
+  .cbtn{width:36px;height:36px;border-radius:9px;background:#fff;border:1px solid #d4e0fa;color:#234ea8;display:flex;align-items:center;justify-content:center;transition:.14s var(--ease);}
+  .cbtn:hover{border-color:#9dbcf4;}.cbtn:active{transform:scale(.94);}
+  .cbtn.on{background:#234ea8;color:#fff;border-color:#234ea8;}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;}
+  .pill.avail{background:var(--green-bg);color:var(--green-tx);}
+  .pill.oncall{background:#E1E9FC;color:#234ea8;}
+  .pdot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .pill.oncall .pdot,.pill.avail .pdot{animation:blip 1.6s var(--ease) infinite;}
+  @keyframes blip{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  .body{display:grid;grid-template-columns:252px 1fr;min-height:580px;}
+  .rail{border-right:1px solid var(--line);padding:18px 14px 14px;display:flex;flex-direction:column;background:#FCFCFD;}
+  .rail .lab{font-size:12.5px;color:var(--ink2);font-weight:500;margin:0 8px 12px;}
+  .qi{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13.5px;color:var(--ink2);transition:.13s var(--ease);}
+  .qi:hover{background:#F1F2F4;}
+  .qi.on{background:var(--blue-soft);color:var(--ink);font-weight:500;}
+  .qi .bdg{font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:11px;background:#EDEef1;color:var(--ink3);font-variant-numeric:tabular-nums;}
+  .qi .bdg.fill{background:var(--blue);color:#fff;}
+  .qi .bdg.soft{background:#fff;border:1px solid var(--line2);color:var(--ink3);font-weight:450;}
+  .rail .tr{margin-top:16px;padding-top:15px;border-top:1px solid var(--line);flex:1;min-height:90px;}
+  .tr .who{font-size:11px;font-weight:600;color:var(--ink3);margin:0;}
+  .tr p.q{font-size:12.5px;line-height:1.5;margin:2px 0 11px;color:var(--ink2);}
+  .tr .ph{font-size:12.5px;color:var(--ink3);font-style:italic;}
+  .foot{display:flex;align-items:center;gap:9px;padding:12px 8px 2px;margin-top:8px;border-top:1px solid var(--line);}
+  .orb{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#7FB0FF,#2563EB 78%);box-shadow:0 1px 3px rgba(37,99,235,.4);}
+  .foot .nm{font-size:13.5px;font-weight:600;flex:1;}
+  .foot .icb{color:var(--ink3);padding:4px;border-radius:6px;transition:.13s;}
+  .foot .icb:hover{background:#EDEef1;color:var(--ink2);}
+
+  .main{padding:22px 26px;}
+  .phead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
+  .pname{display:flex;align-items:center;gap:13px;}
+  .pname .n{font-size:16px;font-weight:600;}
+  .pname .div{width:1px;height:18px;background:var(--line2);}
+  .pname .m{font-size:13.5px;color:var(--ink2);}
+  .acts{display:flex;align-items:center;gap:9px;}
+  .btn{font-size:13.5px;font-weight:500;padding:9px 15px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:8px;transition:.14s var(--ease);}
+  .btn:hover{border-color:var(--ink3);background:#FCFCFD;}.btn:active{transform:scale(.98);}
+  .btn.pri{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .btn.pri:hover{background:var(--blue-d);border-color:var(--blue-d);}
+  .btn.rec.on{background:var(--red);border-color:var(--red);color:#fff;}
+  .recOn{border-color:#f0c4c0;color:var(--red);background:var(--red-soft);}
+  .recOn:hover{border-color:var(--red);background:#FCE3E0;}
+  .recdot{width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;animation:blip 1.3s var(--ease) infinite;}
+  .rectime{font-variant-numeric:tabular-nums;}
+  .body{min-height:0;}
+  .body>.rail{overflow-y:auto;min-height:0;}
+  .visitMain{display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+  .visitMain .phead{flex-shrink:0;}
+  .qscroll{flex:1;min-height:0;overflow-y:auto;}
+
+  .sectit{display:flex;align-items:center;gap:11px;margin:0 0 14px;}
+  .sectit .t{font-size:17px;font-weight:600;letter-spacing:-.01em;}
+  .sectit .bdg{font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:11px;background:var(--blue);color:#fff;}
+  .sectit .bdg.soft{background:#EDEef1;color:var(--ink3);}
+
+  .qcard{display:flex;align-items:flex-start;gap:13px;padding:15px 17px;border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:10px;cursor:pointer;transition:.15s var(--ease);background:#fff;}
+  .qcard:hover{border-color:var(--line2);box-shadow:0 1px 3px rgba(20,23,28,.05);}
+  .qcard.done{background:var(--blue-softer);border-color:#dbe6fc;}
+  .ck{width:21px;height:21px;border-radius:6px;border:2px solid var(--line2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;color:#fff;transition:.15s var(--ease);}
+  .qcard:hover .ck{border-color:var(--blue);}
+  .qcard.done .ck{background:var(--blue);border-color:var(--blue);animation:pop .22s var(--ease);}
+  @keyframes pop{0%{transform:scale(.6);}60%{transform:scale(1.12);}100%{transform:scale(1);}}
+  .qcard .qt{font-size:14.5px;line-height:1.55;}
+  .qcard.done .qt{color:var(--ink2);}
+
+  /* queue */
+  .qhead{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+  .qhead h2{font-size:19px;font-weight:600;letter-spacing:-.015em;margin:0;}
+  .qhead .stats{font-size:13.5px;color:var(--ink2);margin-top:5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .qhead .stats b{color:var(--ink);font-weight:600;}
+  .qhead .stats .sep{color:var(--line2);}
+  .queue{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .qtabs{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface);}
+  .qtab{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:6px 12px;border-radius:7px;color:var(--ink2);transition:.14s var(--ease);}
+  .qtab.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,23,28,.08);}
+  .qtab .c{font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:#E3E5E9;color:var(--ink2);}
+  .qtab.on .c{background:var(--blue);color:#fff;}
+  .qr{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid rgba(20,23,28,.05);transition:.13s var(--ease);}
+  .qr:last-child{border-bottom:0;}
+  .qr:hover{background:var(--surface);}
+  .qr.next{background:var(--blue-softer);}
+  .qr .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+  .qr .mid{flex:1;min-width:0;}
+  .qr .r1{display:flex;align-items:center;gap:9px;flex-wrap:wrap;line-height:1.25;}
+  .qr .nm{font-size:14px;font-weight:600;letter-spacing:-.01em;}
+  .qr .r2{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin-top:5px;}
+  .homeMain{display:flex;flex-direction:column;overflow:hidden;}
+  .homeMain .greet{flex-shrink:0;}
+  .homeMain>.fz{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .homeMain .queue{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .homeMain .qtabs{flex-shrink:0;}
+  .qlist{flex:1;min-height:0;overflow-y:auto;}
+  .ntag{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:2px 8px;border-radius:4px;line-height:1.45;white-space:nowrap;}
+  .ntag.pomona{background:#E6EFFC;color:#1D4ED8;}
+  .ntag.rhode{background:#E3F3E8;color:#16713A;}
+  .ntag.street{background:#EFE9FC;color:#6B2DB8;}
+  .ntag.amber{background:#FAEEDB;color:#8A5407;}
+  .ntag.slate{background:#E9EDF3;color:#42536B;}
+  .ntag.gray{background:#EDEEF1;color:#5B616E;}
+  .ntag.teal{background:#DDF0EC;color:#0F6E56;}
+  .qctx{font-size:12.5px;color:var(--ink3);margin-top:6px;}
+  .lbl{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:450;color:var(--ink2);}
+  .ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .ldot.es{background:#DD8A12;}
+  .ldot.en{background:#5685D6;}
+  .qr .meta{font-size:12.5px;color:var(--ink3);}
+  .doc{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--ink);}
+  .docav{width:20px;height:20px;border-radius:50%;background:#DDF0EC;color:#0F6E56;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;flex-shrink:0;}
+  .qr .right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+  .qr .big{font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .qr .big.long{color:var(--amber);}
+  .qr .sm{font-size:11.5px;color:var(--ink3);}
+  .skill{font-size:11px;font-weight:500;padding:2px 9px;border-radius:11px;}
+  .skill.es{background:var(--amber-bg);color:var(--amber-tx);}
+  .skill.en{background:var(--chip-bg);color:var(--chip-tx);}
+  .dir{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:2px 9px;border-radius:11px;}
+  .dir.in{background:#E1E9FC;color:#234ea8;}
+  .dir.out{background:var(--purple-bg);color:var(--purple-tx);}
+  .tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:5px;letter-spacing:.02em;}
+  .tag.urgent{background:var(--red-soft);color:var(--red-tx);}
+  .tag.attempt{background:#EDEef1;color:var(--ink2);}
+  .tag.next{background:var(--blue);color:#fff;}
+
+  .greet{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
+  .greet h1{font-size:23px;font-weight:600;letter-spacing:-.02em;margin:0;}
+  .greet .sched{font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.55;max-width:580px;}
+  .greet .sched b{color:var(--ink);font-weight:600;}
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:8px 13px;border-radius:10px;border:1px solid var(--line2);background:#fff;transition:.14s var(--ease);}
+  .status:hover{border-color:var(--ink3);}
+  .status .sd{width:8px;height:8px;border-radius:50%;}
+  .status.avail .sd{background:var(--green);}
+  .status.brk .sd{background:var(--amber);}
+  .status svg{color:var(--ink3);}
+  .mkt{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:2px 9px;border-radius:11px;background:#EEEFF2;color:var(--ink2);}
+  .mkt svg{opacity:.65;}
+  .qr .sub{font-size:12px;color:var(--ink3);}
+  .qr .time{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums;}
+  .metaLine{display:flex;align-items:center;flex-wrap:wrap;gap:0;font-size:12.5px;color:var(--ink3);}
+  .metaLine .sep{margin:0 8px;color:#C1C6CF;}
+  .qr .time.long{color:var(--amber);font-weight:600;}
+  .callbtn{font-size:13px;font-weight:500;padding:6px 14px;border-radius:8px;background:var(--blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:98px;height:30px;transition:.14s var(--ease);}
+  .callbtn:hover{background:var(--blue-d);}.callbtn:active{transform:scale(.97);}
+  .callbtn.ans{background:var(--green);}
+  .callbtn.ans:hover{background:#138538;}
+
+  .scrim{position:fixed;inset:0;background:rgba(20,23,28,.42);backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:6vh 26px 26px;z-index:40;animation:fade .2s var(--ease);overflow-y:auto;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  .modal{background:#fff;border-radius:18px;width:536px;max-width:100%;padding:28px 30px;max-height:88vh;overflow:auto;box-shadow:var(--shadow-pop);animation:popin .26s var(--ease);}
+  @keyframes popin{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:none;}}
+  .modal h2{font-size:22px;font-weight:600;margin:0 0 5px;letter-spacing:-.015em;}
+  .modal .lead{font-size:14px;color:var(--ink2);margin:0 0 22px;}
+  .prev{border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;background:var(--surface);}
+  .prev .l{font-size:14px;font-weight:600;}.prev .s{font-size:12.5px;color:var(--ink2);margin-top:4px;}
+  .chk{width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .vt{display:grid;grid-template-columns:1fr 1fr;gap:5px;background:#EEEFF2;border-radius:11px;padding:4px;margin-bottom:20px;}
+  .vt div{padding:11px;text-align:center;font-size:14px;font-weight:500;color:var(--ink2);border-radius:8px;transition:.14s var(--ease);}
+  .vt div.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,23,28,.1);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+  .fld label{font-size:13px;font-weight:500;display:block;margin-bottom:7px;}
+  .fld .v{font-size:14px;border:1px solid var(--line2);border-radius:9px;padding:11px 13px;background:#fff;display:flex;align-items:center;justify-content:space-between;min-height:42px;}
+  .fld .v.ro{background:var(--surface);}
+  .fld .v svg{color:var(--ink3);}
+  .mact{display:flex;justify-content:space-between;align-items:center;margin-top:26px;}
+
+  .reason{border:1px solid var(--line);border-radius:13px;padding:15px 16px;margin-bottom:11px;display:flex;gap:13px;align-items:flex-start;cursor:pointer;transition:.14s var(--ease);}
+  .reason:hover{border-color:var(--line2);}
+  .reason.sel{border-color:var(--blue);background:var(--blue-softer);}
+  .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--line2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:.14s var(--ease);}
+  .reason.sel .rad{border-color:var(--blue);}
+  .reason.sel .rad::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--blue);animation:pop .2s var(--ease);}
+  .reason .rt{font-size:14.5px;font-weight:600;}
+  .reason .rs{font-size:12.5px;color:var(--ink2);margin-top:3px;}
+
+  .incoming{width:430px;max-width:100%;background:#fff;border-radius:20px;padding:30px 28px 24px;text-align:center;box-shadow:var(--shadow-pop);animation:popin .28s var(--ease);position:relative;}
+  .incoming .ring{width:72px;height:72px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;animation:pulse 1.5s var(--ease) infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(37,99,235,.3);}70%{box-shadow:0 0 0 18px rgba(37,99,235,0);}100%{box-shadow:0 0 0 0 rgba(37,99,235,0);}}
+  .incoming .lab{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:9px;}
+  .incoming .n{font-size:21px;font-weight:600;letter-spacing:-.01em;}
+  .incoming .d{font-size:13.5px;color:var(--ink2);margin:6px 0 22px;}
+  .incoming .row{display:flex;gap:12px;}
+  .incoming .row .btn{flex:1;justify-content:center;padding:13px;font-size:14.5px;}
+  .btn.decline{border-color:var(--line2);color:var(--ink2);}
+  .btn.decline:hover{border-color:var(--red);color:var(--red);background:var(--red-soft);}
+  .btn.accept{background:var(--green);border-color:var(--green);color:#fff;}
+  .btn.accept:hover{background:#138538;border-color:#138538;}
+
+  .stab{display:inline-flex;background:#EEEFF2;border-radius:9px;padding:3px;gap:2px;}
+  .stab button{font-size:13px;font-weight:500;padding:7px 16px;border-radius:7px;color:var(--ink2);transition:.15s var(--ease);}
+  .stab button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,23,28,.08);}
+  .stat{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);}
+  .stat .l{font-size:13px;color:var(--ink2);}.stat .v{font-size:14px;font-weight:600;}
+  .brief{border:1px solid var(--line);border-radius:14px;padding:26px 28px;max-width:660px;}
+  .brief h4{font-size:16px;font-weight:600;margin:22px 0 8px;letter-spacing:-.01em;}
+  .brief h4:first-child{margin-top:0;}
+  .brief p{font-size:14px;line-height:1.75;color:#363B45;margin:0;}
+  .term{background:var(--chip-bg);color:var(--chip-tx);padding:1px 6px;border-radius:5px;font-weight:500;white-space:nowrap;}
+
+  .sup{padding:24px 26px;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+  .supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .sup .h{font-size:18px;font-weight:600;letter-spacing:-.015em;margin:2px 0 4px;}
+  .sup .sub{font-size:13.5px;color:var(--ink2);margin:0;}
+  .supActions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end;}
+  .panelHd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .selectMini{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--ink2);border:1px solid var(--line2);background:#fff;border-radius:8px;padding:5px 8px;transition:.14s var(--ease);}
+  .selectMini:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+  .callCount{font-weight:600;text-align:right;font-variant-numeric:tabular-nums;}
+  .thRight{text-align:right;}
+  .supBtn{height:34px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:0 12px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--ink2);transition:.14s var(--ease);white-space:nowrap;}
+  .supBtn:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+  .supBtn.pri{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px;}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0;}
+  .kpi .l{font-size:12px;color:var(--ink2);margin:0;white-space:nowrap;}
+  .kpi .v{font-size:24px;font-weight:600;margin:6px 0 0;letter-spacing:-.02em;}
+  .kpi .hint{font-size:11.5px;color:var(--ink3);margin-top:3px;}
+  .srow{display:grid;grid-template-columns:1.35fr 1.15fr;gap:15px;min-height:0;flex:1;}
+  .panel{border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-height:0;overflow:hidden;}
+  .panel h4{font-size:13.5px;font-weight:600;margin:0 0 4px;}
+
+  .panelHd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;}
+  .selectMini{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;white-space:nowrap;}
+  .callCount{font-size:13px;font-weight:600;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;}
+  .panelSub{font-size:12px;color:var(--ink3);margin:0 0 10px;}
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;color:var(--ink3);padding:0 0 8px;border-bottom:1px solid var(--line);}
+  th.num,td.num{text-align:right;}
+  .arow td{padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  .arow:last-child td{border-bottom:0;}
+  .agent{display:flex;align-items:center;gap:11px;}
+  .agent .agentMeta{font-size:12px;color:var(--ink3);margin-top:2px;}
+  .av{display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;}
+  .stt{font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:11px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .mon{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);color:var(--ink3);display:inline-flex;align-items:center;justify-content:center;margin-left:6px;transition:.14s var(--ease);}
+  .mon:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-softer);}
+
+  .sup{padding:24px 26px;overflow:auto;}
+  .supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .sup .h{font-size:20px;font-weight:600;letter-spacing:-.018em;margin:0 0 4px;}
+  .sup .sub{font-size:13.5px;color:var(--ink2);margin:0;line-height:1.45;}
+  .supActions{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+  .histBtn{font-size:13px;font-weight:500;padding:8px 12px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:8px;transition:.14s var(--ease);}
+  .histBtn:hover{border-color:var(--ink3);background:var(--surface);}
+  .filterBtn{font-size:13px;font-weight:500;padding:8px 11px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--ink2);display:inline-flex;align-items:center;gap:7px;}
+  .metricRows{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+  .metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .metricLabel{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:0 0 7px;}
+  .metric.call{background:#fff;}
+  .metric{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:14px 16px;min-height:88px;}
+  .metric .l{font-size:12.5px;color:var(--ink2);margin:0;}
+  .metric .v{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:6px 0 0;}
+  .metric .hint{font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.35;}
+  .supBody{display:flex;flex-direction:column;gap:15px;align-items:stretch;}
+  .panelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .panelHead h4{font-size:13.5px;font-weight:600;margin:0 0 4px;}
+  .panelHead .desc{font-size:12px;color:var(--ink3);margin:0;line-height:1.45;}
+  .agentTable th,.agentTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:11px 0;vertical-align:middle;}
+  .agentTable th{font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;padding-top:0;}
+  .agentTable tr:last-child td{border-bottom:0;}
+  .callsNum{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .listenBtn{height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;transition:.14s var(--ease);}
+  .listenBtn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-softer);}
+  .listenBtn[disabled]{opacity:.35;cursor:not-allowed;}
+  .queueTable th,.queueTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:14px 0;vertical-align:middle;}
+  .queueTable th{font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;padding-top:0;}
+  .queueTable tr:last-child td{border-bottom:0;}
+  .patientCell{display:flex;align-items:center;gap:10px;min-width:0;}
+  .patientCell .name{font-weight:600;white-space:nowrap;}
+  .patientCell .under{font-size:12px;color:var(--ink3);margin-top:3px;white-space:nowrap;}
+  .routeTxt{font-size:12.5px;color:var(--ink2);white-space:nowrap;}
+  .startScope{height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:.14s var(--ease);white-space:nowrap;}
+  .startScope:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-softer);}
+  .startScope.pri{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .startScope.pri:hover{background:var(--blue-d);border-color:var(--blue-d);}
+  .waitText{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .waitText.long{color:var(--amber);}
+  .superNote{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:12px;padding:11px 13px;background:var(--surface);border-radius:10px;border:1px solid var(--line);}
+  .mon.big{width:auto;min-width:74px;padding:0 10px;gap:7px;font-size:12.5px;font-weight:500;}
+  .cbList{display:flex;flex-direction:column;border-top:1px solid var(--line);}
+  .cb{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  .cb:last-child{border-bottom:0;}
+  .cb .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .cb .nm{font-size:13.5px;font-weight:600;}
+  .cb .meta{font-size:12px;color:var(--ink3);margin-top:4px;}
+  .cb .owner{font-size:12px;color:var(--ink2);margin-top:5px;}
+  .cb .side{display:flex;flex-direction:column;align-items:flex-end;gap:7px;}
+  .miniBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:500;padding:6px 9px;border-radius:7px;border:1px solid var(--line2);background:#fff;color:var(--ink2);transition:.14s var(--ease);white-space:nowrap;}
+  .miniBtn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-softer);}
+
+  /* simple flex tags — just a small label, nothing else */
+  .fz{position:relative;}
+  .ftag{display:none;}
+  .tdot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+  body.fx .ftag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:20px;background:var(--chip-bg);color:var(--chip-tx);}
+  body.fx .ftag.block{display:flex;width:max-content;margin:0 0 12px;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:14px;padding:11px 13px;background:var(--blue-softer);border-radius:10px;}
+  body:not(.fx) .fxnote{display:none;}
+  .note .ni{color:var(--blue);flex-shrink:0;margin-top:1px;}
+
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(8px);background:#15181E;color:#fff;font-size:13.5px;padding:12px 18px;border-radius:11px;box-shadow:var(--shadow-pop);z-index:80;opacity:0;transition:.22s var(--ease);pointer-events:none;display:flex;align-items:center;gap:9px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px;}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  @media(max-width:780px){.body{grid-template-columns:1fr;}.rail{display:none;}.kpis,.metricGrid{grid-template-columns:repeat(2,1fr);}.srow,.supBody{grid-template-columns:1fr;}.main,.sup{padding:18px 16px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="harness">
+    <div><div class="ey">Prototype</div><div class="ttl">Scope + Flex — for the call team</div></div>
+    <div class="spacer"></div>
+    <div class="seg" id="roleSeg"><button data-role="agent" class="on">Agent</button><button data-role="supervisor">Supervisor</button></div>
+    <button class="tog" id="fxTog" type="button"><span class="sw" id="fxSw"><i></i></span>Show Flex tags</button>
+    <button class="reset" id="resetBtn">Reset</button>
+  </div>
+  <div class="app" id="app"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ICN={
+ phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
+ micOff:'<line x1="2" x2="22" y1="2" y2="22"/><path d="M18.9 13.2A7 7 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.3V5a3 3 0 0 0-5.7-1.3"/><path d="M9 9v3a3 3 0 0 0 5.1 2.1"/><line x1="12" x2="12" y1="19" y2="22"/>',
+ pause:'<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+ transfer:'<path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/>',
+ headphones:'<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+ userPlus:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ chevDown:'<path d="m6 9 6 6 6-6"/>',
+ calendar:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+ clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+ printer:'<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
+ help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+ user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ panel:'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+ phoneIn:'<polyline points="15 2 15 8 21 8"/><line x1="21" x2="15" y1="2" y2="8"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ phoneOut:'<polyline points="16 8 22 8 22 2"/><line x1="16" x2="22" y1="8" y2="2"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+ zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'
+};
+function ic(n,s,c){return `<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;}
+const AVC=[['#E1E9FC','#234ea8'],['#FBF0DD','#92590B'],['#E7F6EC','#157F3C'],['#F3E8FD','#7321b6'],['#FCE7EF','#a01a52'],['#E0F2F1','#0d6e63']];
+function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function avc(n){let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%AVC.length;return AVC[h];}
+function avatar(n,sz){const[bg,fg]=avc(n);return `<span class="av" style="width:${sz||32}px;height:${sz||32}px;border-radius:50%;font-size:${(sz||32)<34?'11.5px':'13px'};background:${bg};color:${fg}">${initials(n)}</span>`;}
+
+const SECTIONS=[
+ {k:'hpi',n:'History of present illness',q:[
+  ["Can you point to where exactly on your chest you're experiencing this pain?","It's right in the center, behind my breastbone."],
+  ["Does the pain radiate anywhere, such as to your back, arms, or neck?","Sometimes it goes down my left arm when I'm walking."],
+  ["Any other symptoms — shortness of breath, palpitations, dizziness, or fatigue?","Short of breath on stairs, and more tired than usual."],
+  ["When did you first notice the chest pain starting?","About a year ago."]
+ ]},
+ {k:'fu',n:'Follow up questions',badge:'Needs more info',q:[
+  ["Does the chest pressure ever wake you at night?","No, not at night."],
+  ["How long does a typical episode last?","Just a few minutes."]
+ ]},
+ {k:'ros',n:'Review of systems',q:[
+  ["Any changes in your appetite or weight recently?","No real changes."],
+  ["Any recent fevers, chills, or night sweats?","No."],
+  ["How have you been sleeping lately?","Okay, a little restless."],
+  ["Any changes in your bowel or urinary habits?","No."],
+  ["Any skin changes or rashes you've noticed?","No."]
+ ]},
+ {k:'pmh',n:'Past medical history',q:[
+  ["Any chronic conditions, like diabetes or high blood pressure?","Diabetes and high blood pressure."],
+  ["Any previous surgeries or hospital stays?","Gallbladder removed in 2015."],
+  ["Any allergies to medications?","None that I know of."],
+  ["When was your last physical or lab work?","Last summer."]
+ ]},
+ {k:'meds',n:'Medications',q:[
+  ["What medications are you currently taking?","Metformin and lisinopril."],
+  ["Are you taking them as prescribed?","Yes, most days."],
+  ["Any over-the-counter medicines or supplements?","A daily vitamin."],
+  ["Have you noticed any side effects?","No."]
+ ]},
+ {k:'fh',n:'Family history',q:[
+  ["Any heart disease in your immediate family?","My father had a heart attack."],
+  ["Any history of diabetes in the family?","Yes, my mother."],
+  ["Any cancer in the family?","No."],
+  ["Any other inherited conditions?","Not that I know of."]
+ ]},
+ {k:'sh',n:'Social history',q:[
+  ["Do you smoke or use tobacco?","I quit about five years ago."],
+  ["How often do you drink alcohol?","Only occasionally."],
+  ["Do you exercise regularly?","I walk a few times a week."],
+  ["Who do you live with at home?","My wife."]
+ ]},
+ {k:'dx',n:'Differential questions',q:[
+  ["Does the pain get worse with exertion?","Yes, walking uphill."],
+  ["Does it ease with rest?","Usually, yes."],
+  ["Any swelling in your legs or ankles?","A little by the end of the day."],
+  ["Have you felt your heart racing or skipping beats?","Once or twice."]
+ ]}
+];
+const TOTALQ=SECTIONS.reduce((s,x)=>s+x.q.length,0);
+const ansCount=k=>S.answered.filter(id=>id.split(':')[0]===k).length;
+const isAns=(k,i)=>S.answered.includes(k+':'+i);
+
+// outbound pre-visit calls to make today
+const QUEUE=[
+ {nm:"Michael Dia",sex:"Male",dob:"09/09/1974",age:51,phone:"(909) 808-4872",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"2:30 PM"},
+ {nm:"Lucia Ramos",sex:"Female",dob:"03/14/1969",age:56,phone:"(909) 555-0188",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"2:45 PM"},
+ {nm:"James Tran",sex:"Male",dob:"11/02/1960",age:64,phone:"(909) 555-0103",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"3:00 PM"},
+ {nm:"Maria Gonzalez",sex:"Female",dob:"06/18/1981",age:43,phone:"(909) 555-0211",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"3:15 PM"},
+ {nm:"David Okafor",sex:"Male",dob:"01/27/1978",age:47,phone:"(909) 555-0299",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"3:30 PM"},
+ {nm:"Yuki Tanaka",sex:"Female",dob:"08/05/1990",age:34,phone:"(909) 555-0247",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"3:45 PM"},
+ {nm:"Carlos Mendoza",sex:"Male",dob:"12/11/1965",age:59,phone:"(909) 555-0166",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"4:00 PM"},
+ {nm:"Aaliyah Johnson",sex:"Female",dob:"04/22/1986",age:39,phone:"(909) 555-0318",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"4:15 PM"},
+ {nm:"Fatima Noor",sex:"Female",dob:"10/30/1972",age:52,phone:"(909) 555-0274",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"4:30 PM"},
+ {nm:"Sofia Herrera",sex:"Female",dob:"02/09/1995",age:30,phone:"(909) 555-0290",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"4:45 PM"},
+ {nm:"Wei Chen",sex:"Male",dob:"07/16/1958",age:66,phone:"(909) 555-0135",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"5:00 PM"},
+ {nm:"Diego Flores",sex:"Male",dob:"05/03/1983",age:42,phone:"(909) 555-0342",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"5:15 PM"}
+];
+// inbound callbacks waiting
+const CALLBACKS=[
+ {nm:"Rosa Medina",sex:"Female",dob:"06/22/1968",age:56,phone:"(909) 555-0177",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",wait:"2:14",urgent:true},
+ {nm:"Daniel Park",sex:"Male",dob:"01/15/1984",age:41,phone:"(909) 555-0145",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"1:47",urgent:false},
+ {nm:"Aisha Khan",sex:"Female",dob:"09/30/1979",age:45,phone:"(909) 555-0162",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"1:12",urgent:false},
+ {nm:"Jorge Ramirez",sex:"Male",dob:"03/08/1971",age:54,phone:"(909) 555-0193",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",wait:"0:58",urgent:false},
+ {nm:"Linda Vu",sex:"Female",dob:"11/19/1988",age:36,phone:"(909) 555-0151",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"0:33",urgent:false},
+ {nm:"Priya Patel",sex:"Female",dob:"07/04/1992",age:32,phone:"(909) 555-0184",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"0:19",urgent:false},
+ {nm:"Ahmed Hassan",sex:"Male",dob:"02/27/1976",age:49,phone:"(909) 555-0205",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",wait:"0:05",urgent:false}
+];
+
+let S,callInt=null,recInt=null;
+const fresh=()=>({view:'agent',screen:'available',modal:null,fx:false,qtab:'outbound',status:'Ready',active:null,muted:false,hold:false,recording:false,recPaused:false,callSec:0,recSec:0,reason:0,answered:[],sumTab:'brief'});
+S=fresh();
+const app=document.getElementById('app');
+const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+function toast(t){const e=document.getElementById('toast');e.innerHTML=ic('zap',16,'#7FB0FF')+'<span>'+t+'</span>';e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200);}
+function stop(){if(callInt){clearInterval(callInt);callInt=null;}if(recInt){clearInterval(recInt);recInt=null;}}
+function runCall(){stop();S.callSec=0;callInt=setInterval(()=>{if(!S.hold){S.callSec++;const t=document.getElementById('callTimer');if(t)t.textContent=fmt(S.callSec);}},1000);}
+const P=()=>S.active||QUEUE[0];
+const lang=s=>s==='es'?'Spanish':'English';
+const MKT={'Pomona':'pomona','Rhode Island':'rhode','Street Med':'street'};
+function mkt(m){return `<span class="ntag ${MKT[m]||'gray'}">${m}</span>`;}
+function langtag(s){return `<span class="lbl"><span class="ldot ${s}"></span>${lang(s)}</span>`;}
+function langChip(s){return `<span class="ntag ${s==='es'?'amber':'slate'}">${lang(s)}</span>`;}
+function spanishBadge(s){return s==='es'?'<span class="ntag amber">Spanish</span>':'';}
+function waitSeconds(t){const [m='0',s='0']=String(t).split(':');return (parseInt(m,10)||0)*60+(parseInt(s,10)||0);}
+function isUrgentWait(t){return waitSeconds(t)>120;}
+function vtag(t){return `<span class="ntag gray">${t}</span>`;}
+function drtag(p){return `<span class="ntag teal">${p}</span>`;}
+function doctag(p){return `<span class="lbl"><span class="ldot doc"></span>${p}</span>`;}
+
+function strip(){
+ const p=P();
+ return `<div class="strip fz"><span class="ftag"><span class="tdot"></span>Flex</span>
+  <span class="who">${ic('phone',16,'#234ea8')} On call &nbsp;·&nbsp; <b>${p.nm}</b> &nbsp;·&nbsp; ${p.phone}</span>
+  <span class="tm" id="callTimer">0:00</span><span style="flex:1"></span>
+  <button class="cbtn ${S.muted?'on':''}" id="mute" aria-label="Mute">${ic(S.muted?'micOff':'mic',17)}</button>
+  <button class="cbtn ${S.hold?'on':''}" id="hold" aria-label="Hold">${ic('pause',17)}</button>
+  <button class="cbtn" id="xfer" aria-label="Transfer">${ic('transfer',17)}</button>
+  <span class="pill oncall"><span class="pdot"></span>On call</span>
+  <span style="font-size:12.5px;color:#234ea8;font-weight:500">Amy Luna</span></div>`;
+}
+function startRecTimer(){if(recInt)clearInterval(recInt);recInt=setInterval(()=>{if(!S.recPaused){S.recSec++;const t=document.getElementById('rectime');if(t)t.textContent=fmt(S.recSec);}},1000);}
+function rail(){
+ let items='';
+ SECTIONS.forEach((s,idx)=>{
+  const c=ansCount(s.k),active=idx===0;
+  const bdg=s.badge?`<span class="bdg soft">${s.badge}</span>`:`<span class="bdg ${active&&c>0?'fill':''}">${c}/${s.q.length}</span>`;
+  items+=`<div class="qi ${active?'on':''}"><span>${s.n}</span>${bdg}</div>`;
+ });
+ let tr='';
+ S.answered.forEach(id=>{const[k,i]=id.split(':');const sec=SECTIONS.find(s=>s.k===k);if(sec){const qq=sec.q[+i];tr+=`<p class="who">MA</p><p class="q">${qq[0]}</p><p class="who">PATIENT</p><p class="q">${qq[1]}</p>`;}});
+ if(!tr)tr='<p class="ph">Recording will transcribe the call here…</p>';
+ return `<div class="rail"><div class="lab">Questions</div>${items}
+  <div class="tr"><div class="lab" style="margin-left:0">Transcript</div>${tr}</div>
+  <div class="foot"><span class="orb"></span><span class="nm">Scope AI</span>
+   <button class="icb" aria-label="Help">${ic('help',17)}</button><button class="icb" aria-label="Account">${ic('user',17)}</button><button class="icb" aria-label="Collapse">${ic('panel',17)}</button></div></div>`;
+}
+function questions(){
+ return SECTIONS.map(s=>{
+  const c=ansCount(s.k);
+  const bdg=s.badge?`<span class="bdg soft">${s.badge}</span>`:`<span class="bdg ${c>0?'':'soft'}">${c}/${s.q.length}</span>`;
+  const cards=s.q.map((qq,i)=>{const d=isAns(s.k,i);return `<div class="qcard ${d?'done':''}" data-k="${s.k}" data-i="${i}"><span class="ck">${d?ic('check',14):''}</span><span class="qt">${qq[0]}</span></div>`;}).join('');
+  return `<div class="sectit"><span class="t">${s.n}</span>${bdg}</div>${cards}`;
+ }).join('');
+}
+
+function queueRows(){
+ function meta(p){
+  const parts=[p.market,p.prov,p.type];
+  return `<div class="metaLine">${parts.map((part,idx)=>`${idx?'<span class="sep">·</span>':''}<span>${part}</span>`).join('')}</div>`;
+ }
+ if(S.qtab==='inbound'){
+  return CALLBACKS.map((c,i)=>{const urgent=isUrgentWait(c.wait);return `<div class="qr">${avatar(c.nm,38)}
+   <div class="mid"><div class="r1"><span class="nm">${c.nm}</span>${urgent?'<span class="tag urgent">Urgent</span>':''}${spanishBadge(c.skill)}</div>
+    <div class="r2">${meta(c)}</div></div>
+   <div class="right"><span class="time ${urgent?'long':''}">${c.wait} waiting</span>
+    <button class="callbtn ans" data-call="${i}">${ic('phoneIn',14)} Answer</button></div></div>`;}).join('');
+ }
+ return QUEUE.map((p,i)=>`<div class="qr">${avatar(p.nm,38)}
+  <div class="mid"><div class="r1"><span class="nm">${p.nm}</span>${spanishBadge(p.skill)}</div>
+   <div class="r2">${meta(p)}</div></div>
+  <div class="right"><span class="time">${p.sched}</span>
+   <button class="callbtn" data-call="${i}">${ic('phoneOut',14)} Call</button></div></div>`).join('');
+}
+
+
+function agent(){
+ if(S.screen==='available'){
+  app.innerHTML=`<div class="stage"><div class="main homeMain">
+   <div class="greet">
+    <div><h1>Amy's call queue</h1></div>
+    <button class="status ${S.status==='Ready'?'avail':'brk'}" id="statusBtn"><span class="sd"></span>${S.status} ${ic('chevDown',15)}</button>
+   </div>
+   <div class="fz"><span class="ftag block"><span class="tdot"></span>Flex · queue</span>
+    <div class="queue">
+     <div class="qtabs" id="qtabs">
+      <button class="qtab ${S.qtab==='outbound'?'on':''}" data-t="outbound">${ic('phoneOut',15)} Outbound <span class="c">${QUEUE.length}</span></button>
+      <button class="qtab ${S.qtab==='inbound'?'on':''}" data-t="inbound">${ic('phoneIn',15)} Inbound <span class="c">${CALLBACKS.length}</span></button>
+     </div>
+     <div class="qlist">${queueRows()}</div>
+    </div>
+   </div>
+  </div></div>`;
+  document.querySelectorAll('#qtabs .qtab').forEach(b=>b.onclick=()=>{S.qtab=b.dataset.t;render();});
+  document.getElementById('statusBtn').onclick=()=>{S.status=S.status==='Ready'?'On break':'Ready';toast('Status set to '+S.status);render();};
+  document.querySelectorAll('[data-call]').forEach(b=>b.onclick=()=>{S.active=(S.qtab==='inbound'?CALLBACKS:QUEUE)[+b.dataset.call];S.screen='startVisit';render();});
+ }
+ else if(S.screen==='inVisit'){
+  const p=P();
+  const recUI=S.recording
+   ?`<button class="btn recOn" id="rec"><span class="recdot"></span> Stop recording · <span id="rectime">${fmt(S.recSec)}</span></button>`
+   :`<button class="btn" id="rec">${ic('mic',16)} Start recording</button>`;
+  app.innerHTML=`<div class="stage">${strip()}<div class="body">${rail()}<div class="main visitMain">
+   <div class="phead"><div class="pname"><span class="n">${p.nm}</span><span class="div"></span><span class="m">${p.sex} · ${p.dob} · ${p.age}</span></div>
+    <div class="acts">${recUI}<button class="btn pri" id="end">End visit</button></div></div>
+   <div class="qscroll">${questions()}
+    <div class="note fxnote"><span class="ni">${ic('zap',15)}</span><span>Only the call strip on top is new. The questions, recording and transcript are Scope exactly as today.</span></div>
+   </div>
+  </div></div></div>`;
+  document.getElementById('end').onclick=()=>{S.modal='endVisit';render();};
+  document.getElementById('rec').onclick=()=>{S.recording=!S.recording;if(S.recording){S.recSec=0;startRecTimer();}else if(recInt){clearInterval(recInt);recInt=null;}render();};
+  document.querySelectorAll('.qcard').forEach(c=>c.onclick=()=>{const id=c.dataset.k+':'+c.dataset.i;S.answered.includes(id)?S.answered=S.answered.filter(x=>x!==id):S.answered.push(id);render();});
+  document.getElementById('mute').onclick=()=>{S.muted=!S.muted;render();};
+  document.getElementById('hold').onclick=()=>{S.hold=!S.hold;toast(S.hold?'Call on hold':'Call resumed');render();};
+  document.getElementById('xfer').onclick=()=>toast('Transfer — choose an agent or queue');
+ }
+ else if(S.screen==='summary'){
+  const p=P();
+  const brief=`<div class="brief">
+   <h4>Chief complaint</h4><p><span class="term">Chest pain</span> with <span class="term">shortness of breath on exertion</span>.</p>
+   <h4>History of present illness</h4><p>${p.age}-year-old ${p.sex.toLowerCase()} presents for a pre-visit assessment ahead of a primary care appointment with ${p.prov}. Reports <span class="term">central chest pressure</span> behind the sternum, intermittent over the past year, with <span class="term">radiation to the left arm</span> on exertion such as walking uphill, and relief with rest. Associated <span class="term">exertional dyspnea</span> on stairs and progressive <span class="term">fatigue</span>. Episodes last a few minutes and do not wake the patient at night. Denies <span class="term">syncope</span>.</p>
+   <h4>Review of systems</h4><p>Positive for <span class="term">chest pain</span>, <span class="term">exertional dyspnea</span>, <span class="term">fatigue</span>, occasional <span class="term">palpitations</span>, and mild end-of-day <span class="term">lower-extremity edema</span>. Denies fever, chills, night sweats, appetite or weight change, bowel or urinary changes, or rashes. Sleep mildly restless.</p>
+   <h4>Past medical history</h4><p><span class="term">Type 2 diabetes mellitus</span>, <span class="term">hypertension</span>, and <span class="term">hyperlipidemia</span>.</p>
+   <h4>Past surgical history</h4><p><span class="term">Cholecystectomy</span> (2015).</p>
+   <h4>Medications</h4><p><span class="term">Metformin</span>, <span class="term">lisinopril</span>, and a daily multivitamin. Reports good adherence with no side effects.</p>
+   <h4>Allergies</h4><p>No known drug allergies.</p>
+   <h4>Family history</h4><p>Father — <span class="term">myocardial infarction</span>. Mother — <span class="term">type 2 diabetes</span>. No known family history of cancer.</p>
+   <h4>Social history</h4><p>Former tobacco use, quit approximately 5 years ago. Occasional alcohol. Walks for exercise a few times weekly. Lives with spouse.</p>
+   <h4>Assessment</h4><p>${p.age}-year-old with multiple cardiovascular risk factors (<span class="term">diabetes</span>, <span class="term">hypertension</span>, <span class="term">hyperlipidemia</span>, family history of coronary disease, former smoker) presenting with exertional chest pressure radiating to the left arm and associated dyspnea — concerning for possible <span class="term">stable angina</span>. Differential includes <span class="term">coronary artery disease</span>, <span class="term">GERD</span>, and musculoskeletal pain.</p>
+   <h4>Plan</h4><p>Flagged for provider review prior to the visit. Recommend <span class="term">ECG</span> and labs (<span class="term">lipid panel</span>, <span class="term">HbA1c</span>, <span class="term">BMP</span>) at the appointment. Consider <span class="term">cardiology referral</span> or <span class="term">stress testing</span> per provider assessment. Continue current medications and review blood pressure control. Patient counseled on red-flag symptoms warranting urgent care.</p></div>`;
+  const transcript=`<div class="brief">${S.answered.length?S.answered.map(id=>{const[k,i]=id.split(':');const qq=SECTIONS.find(s=>s.k===k).q[+i];return `<p style="margin-bottom:14px"><span style="color:var(--ink3);font-size:11px;font-weight:600">MA</span><br>${qq[0]}<br><span style="color:var(--ink3);font-size:11px;font-weight:600">PATIENT</span><br>${qq[1]}</p>`;}).join(''):'<p style="color:var(--ink2)">No questions were checked during this visit.</p>'}</div>`;
+  app.innerHTML=`<div class="stage"><div class="body">
+   <div class="rail"><div class="lab">Session stats</div><div style="padding:0 8px">
+     <div class="stat"><span class="l">Time with patient</span><span class="v">${fmt(S.callSec||72)}</span></div>
+     <div class="stat"><span class="l">Questions answered</span><span class="v">${S.answered.length}/${TOTALQ}</span></div>
+     <div class="stat" style="border-bottom:0"><span class="l">Session score</span><span class="stt" style="background:var(--green-bg);color:var(--green-tx)">★ 5 Stars</span></div></div>
+    <div class="foot" style="margin-top:auto"><span class="orb"></span><span class="nm">Scope AI</span>
+     <button class="icb">${ic('help',17)}</button><button class="icb">${ic('user',17)}</button><button class="icb">${ic('panel',17)}</button></div></div>
+   <div class="main"><div class="phead">
+     <div class="stab" id="stab"><button class="${S.sumTab==='brief'?'on':''}" data-t="brief">AI brief</button><button class="${S.sumTab==='transcript'?'on':''}" data-t="transcript">Transcript</button></div>
+     <div class="acts"><button class="btn" id="print">${ic('printer',16)} Print</button><button class="btn pri" id="return">Return to schedule</button></div></div>
+    ${S.sumTab==='brief'?brief:transcript}
+    <div class="note fxnote"><span class="ni">${ic('zap',15)}</span><span>On return, Flex sets you back to Ready and routes the next waiting patient — automatically.</span></div>
+   </div></div></div>`;
+  document.querySelectorAll('#stab button').forEach(b=>b.onclick=()=>{S.sumTab=b.dataset.t;render();});
+  document.getElementById('print').onclick=()=>toast('Sent to print');
+  document.getElementById('return').onclick=()=>{stop();S.screen='available';S.active=null;S.answered=[];S.recording=S.muted=S.hold=S.recPaused=false;toast('Back on your queue');render();};
+ }
+
+ if(S.screen==='startVisit'){
+  const p=P();
+  app.insertAdjacentHTML('beforeend',`<div class="scrim"><div class="modal">
+   <h2>Start new visit</h2><p class="lead">Verify patient details to start your Scope visit</p>
+   <div class="prev"><div><div class="l">Previous note</div><div class="s">August 5, 2025 · Signed by Dr. Alla</div></div><div class="chk">${ic('check',14)}</div></div>
+   <div class="vt"><div class="on">Call</div><div>In-person</div></div>
+   <div class="note fxnote" style="margin:-8px 0 16px"><span class="ni">${ic('zap',15)}</span><span>Patient, phone and provider are pre-filled from the queue — the agent doesn't type anything.</span></div>
+   <div class="grid2">
+    <div class="fld"><label>Patient</label><div class="v ro">${p.nm}</div></div>
+    <div class="fld"><label>Phone number</label><div class="v ro">${p.phone}</div></div>
+    <div class="fld"><label>Sex</label><div class="v">${p.sex} ${ic('chevDown',16)}</div></div>
+    <div class="fld"><label>Date of birth</label><div class="v">${p.dob} ${ic('calendar',16)}</div></div>
+    <div class="fld"><label>Provider</label><div class="v">${p.prov} ${ic('chevDown',16)}</div></div>
+    <div class="fld"><label>Visit type</label><div class="v">${p.type} — Consult ${ic('chevDown',16)}</div></div></div>
+   <div class="mact"><button class="btn" id="back">Back to schedule</button><button class="btn pri" id="start">Start visit</button></div></div></div>`);
+  document.getElementById('start').onclick=()=>{S.screen='inVisit';render();runCall();};
+  document.getElementById('back').onclick=()=>{S.screen='available';render();};
+ }
+ if(S.modal==='endVisit'){
+  const R=[['Completed visit','Visit was successfully completed'],['Patient declined','Patient chose not to proceed'],['Reschedule appointment','Schedule a new visit time'],['Reschedule Scope call','Put the patient back in the queue'],['Other','']];
+  app.insertAdjacentHTML('beforeend',`<div class="scrim"><div class="modal"><h2>End visit</h2><p class="lead">Select your reason for ending the visit</p>
+   ${R.map((r,i)=>`<div class="reason ${S.reason===i?'sel':''}" data-r="${i}"><div class="rad"></div><div><div class="rt">${r[0]}</div>${r[1]?`<div class="rs">${r[1]}</div>`:''}</div></div>`).join('')}
+   <div class="note fxnote"><span class="ni">${ic('zap',15)}</span><span>Confirm saves the reason to the chart (Scope), then closes the call and frees you for the next patient (Flex) — one click.</span></div>
+   <div class="mact"><button class="btn" id="cancel">Cancel</button><button class="btn pri" id="confirm">Confirm</button></div></div></div>`);
+  document.querySelectorAll('.reason').forEach(r=>r.onclick=()=>{S.reason=+r.dataset.r;render();});
+  document.getElementById('cancel').onclick=()=>{S.modal=null;render();};
+  document.getElementById('confirm').onclick=()=>{S.modal=null;S.screen='summary';stop();render();};
+ }
+}
+
+function supervisor(){
+ const A=[
+  {name:'Dezaray Vasquez',status:'On call',code:'oncall',time:'3:11',calls:24},
+  {name:'Franklin Ramirez',status:'On call',code:'oncall',time:'0:48',calls:19},
+  {name:'Anna Calcetas',status:'Ready',code:'ready',time:'',calls:22},
+  {name:'Amy Luna',status:'On call',code:'oncall',time:'1:52',calls:17},
+  {name:'Oscar Cordova',status:'Ready',code:'ready',time:'',calls:16},
+  {name:'Claudia Campos',status:'Ready',code:'ready',time:'',calls:21},
+  {name:'Marielos Guevera',status:'On break',code:'break',time:'',calls:14}
+ ];
+ const stp={oncall:'background:#E1E9FC;color:#234ea8',ready:'background:var(--green-bg);color:var(--green-tx)',break:'background:var(--amber-bg);color:var(--amber-tx)'};
+ const ready=A.filter(a=>a.code==='ready').length;
+ const oncall=A.filter(a=>a.code==='oncall').length;
+ const onbreak=A.filter(a=>a.code==='break').length;
+ const W=CALLBACKS.slice(0,6);
+ const statusLabel=a=>`${a.status}${a.time?' · '+a.time:''}`;
+ app.innerHTML=`<div class="stage"><div class="sup fz"><span class="ftag block"><span class="tdot"></span>Flex · live floor</span>
+  <div class="supTop">
+   <div><div class="h">Supervisor console</div><p class="sub">Live agent state for today. Keep historical KPIs and inbound service-level reporting in Sigma.</p></div>
+   <div class="supActions"><button class="filterBtn" id="teamFilter">All agents ${ic('chevDown',14)}</button><button class="histBtn" id="sigmaBtn">${ic('panel',15)} Historical KPIs</button></div>
+  </div>
+  <div class="metricRows">
+   <div>
+    <div class="metricLabel">Team</div>
+    <div class="metricGrid">
+     <div class="metric"><p class="l">Ready</p><p class="v" style="color:var(--green)">${ready}</p><div class="hint">Available for the next call</div></div>
+     <div class="metric"><p class="l">On call</p><p class="v">${oncall}</p><div class="hint">Currently talking to patients</div></div>
+     <div class="metric"><p class="l">On break</p><p class="v" style="color:var(--amber)">${onbreak}</p><div class="hint">Unavailable by choice</div></div>
+    </div>
+   </div>
+   <div>
+    <div class="metricLabel">Calls today</div>
+    <div class="metricGrid">
+     <div class="metric call"><p class="l">Outbound completed</p><p class="v">86</p><div class="hint">Pre-visit calls completed</div></div>
+     <div class="metric call"><p class="l">Inbound completed</p><p class="v">47</p><div class="hint">Callbacks answered</div></div>
+     <div class="metric call"><p class="l">Avg inbound wait</p><p class="v">0:42</p><div class="hint">Answered inbound calls only</div></div>
+    </div>
+   </div>
+  </div>
+  <div class="supBody">
+   <div class="panel"><div class="panelHead"><div><h4>Agents</h4><p class="desc">One action: listen to live calls. Calls today gives supervisors quick productivity context.</p></div></div>
+    <table class="agentTable"><thead><tr><th>Agent</th><th>Status</th><th>Calls today</th><th style="text-align:right">Action</th></tr></thead><tbody>
+    ${A.map(a=>`<tr><td><div class="agent">${avatar(a.name)}<span style="font-weight:500">${a.name}</span></div></td>
+     <td><span class="stt" style="${stp[a.code]}">${statusLabel(a)}</span></td>
+     <td><span class="callsNum">${a.calls}</span></td>
+     <td style="text-align:right">${a.code==='oncall'?`<button class="listenBtn" data-a="Listening to ${a.name.split(' ')[0]}'s call">${ic('headphones',15)} Listen</button>`:`<button class="listenBtn" disabled>${ic('headphones',15)} Listen</button>`}</td></tr>`).join('')}
+    </tbody></table>
+   </div>
+   <div class="panel"><div class="panelHead"><div><h4>Inbound call queue</h4><p class="desc">Separate from agent state. This is only the live list of patients waiting for an inbound call to be answered.</p></div></div>
+    <table class="queueTable"><thead><tr><th>Patient</th><th>Wait</th><th>Language</th><th style="text-align:right">Action</th></tr></thead><tbody>
+    ${W.map((w,i)=>{const urgent=isUrgentWait(w.wait);return `<tr><td><div class="patientCell">${avatar(w.nm,34)}<div><div class="name">${w.nm}</div><div class="under">${w.prov} · ${w.type}</div></div></div></td>
+      <td><span class="waitText ${urgent?'long':''}">${w.wait}</span>${urgent?'<div style="margin-top:4px"><span class="tag urgent">Urgent</span></div>':''}</td>
+      <td>${w.skill==='es'?spanishBadge(w.skill):'<span class="meta">English</span>'}</td>
+      <td style="text-align:right"><button class="startScope ${urgent?'pri':''}" data-start="${i}">${ic('phoneIn',14)} Start Scope</button></td></tr>`;}).join('')}
+    </tbody></table>
+    <div class="superNote">Urgent is automatic after 2:00 waiting. I kept this queue below the agent table so it doesn't mix with Ready / On call / On break.</div>
+   </div>
+  </div></div></div>`;
+ document.getElementById('sigmaBtn').onclick=()=>{toast('Opening historical KPIs in Sigma');window.open('https://app.sigmacomputing.com/','_blank','noopener');};
+ document.getElementById('teamFilter').onclick=()=>toast('Filter by pod or clinic');
+ document.querySelectorAll('.listenBtn:not([disabled])').forEach(m=>m.onclick=()=>toast(m.dataset.a));
+ document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{S.view='agent';S.qtab='inbound';S.active=CALLBACKS[+b.dataset.start];S.screen='startVisit';document.querySelectorAll('#roleSeg button').forEach(x=>x.classList.toggle('on',x.dataset.role==='agent'));render();});
+}
+
+
+
+function render(){
+ document.body.classList.toggle('fx',S.fx);
+ if(S.view==='agent')agent();else supervisor();
+}
+document.getElementById('roleSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.view=b.dataset.role;document.querySelectorAll('#roleSeg button').forEach(x=>x.classList.toggle('on',x===b));render();};
+document.getElementById('fxTog').onclick=()=>{S.fx=!S.fx;document.getElementById('fxSw').classList.toggle('on',S.fx);render();};
+document.getElementById('resetBtn').onclick=()=>{stop();const v=S.view,f=S.fx;S=fresh();S.view=v;S.fx=f;render();};
+render();
+</script>
+</body>
+</html>
