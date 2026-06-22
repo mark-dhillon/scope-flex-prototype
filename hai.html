@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scope + Flex — Call Team Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#0C6E99; --blue-d:#0A5C80; --blue-soft:#F0F0F1; --blue-softer:#FAFAFA;
+    --chip-bg:#EBECED; --chip-tx:#1A1A1A;
+    --ink-h:#333336;
+    --purple-bg:#EAE3F2; --purple-tx:#693FA5;
+    --red:#E03D3E; --red-soft:#FBE4E3; --red-tx:#E03D3E;
+    --green:#0E7B6C; --green-bg:#DDEDEA; --green-tx:#0E7B6C;
+    --amber:#D9730B; --amber-bg:#FAEBDD; --amber-tx:#D9730B;
+    --ink:#1A1A1A; --ink2:#57575C; --ink3:#9C9CA3;
+    --line:rgba(0,0,0,.09); --line2:rgba(0,0,0,.14);
+    --surface:#FAFAFA; --white:#fff; --page:#F4F4F5;
+    --r-lg:16px; --r-md:11px; --r-sm:8px;
+    --ease:cubic-bezier(.32,.72,.35,1);
+    --shadow:0 1px 3px rgba(0,0,0,.06);
+    --shadow-pop:0 12px 40px rgba(0,0,0,.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--ink);background:var(--white);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-.006em;}
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit;}
+  svg{display:block;}
+  ::selection{background:#D9EAF7;}
+
+  /* ── floating view switcher (bottom-right) ── */
+  .viewFab{position:fixed;right:22px;bottom:22px;z-index:70;display:inline-flex;align-items:center;gap:9px;height:44px;padding:0 15px 0 14px;background:#fff;color:var(--ink);border:1px solid var(--line2);border-radius:24px;box-shadow:0 4px 14px rgba(0,0,0,.10),0 1px 2px rgba(0,0,0,.05);transition:.16s var(--ease);}
+  .viewFab:hover{transform:translateY(-1px);border-color:var(--ink3);box-shadow:0 7px 20px rgba(0,0,0,.13),0 1px 2px rgba(0,0,0,.05);}
+  .viewFab:active{transform:translateY(0);}
+  .vfIcon{color:var(--ink2);}
+  .vfLabel{font-size:13.5px;font-weight:600;letter-spacing:-.01em;}
+  .vfChev{color:var(--ink3);transition:transform .2s var(--ease);}
+  .viewFab.open{border-color:var(--ink3);}
+  .viewFab.open .vfChev{transform:rotate(180deg);}
+  .viewScrim{position:fixed;inset:0;z-index:65;background:transparent;}
+  .viewMenu{position:fixed;right:22px;bottom:76px;z-index:71;width:232px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);padding:7px;animation:menuRise .16s var(--ease);}
+  @keyframes menuRise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .vmLabel{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);padding:7px 10px 6px;}
+  .vmItem{display:flex;align-items:center;gap:9px;width:100%;text-align:left;font-size:14px;font-weight:500;color:var(--ink);padding:9px 10px;border-radius:9px;transition:.12s var(--ease);}
+  .vmItem:hover{background:var(--surface);}
+  .vmItem.on{background:var(--blue-softer);color:var(--blue-d);font-weight:600;}
+  .vmTick{width:15px;height:15px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--blue-d);}
+  .vmItem.on .vmTick::after{content:"";width:7px;height:11px;border:solid currentColor;border-width:0 2.4px 2.4px 0;transform:rotate(42deg);margin-top:-2px;}
+  .vmDiv{height:1px;background:var(--line);margin:7px 6px;}
+  .vmTog{padding:9px 10px;border-radius:9px;font-size:13px;width:100%;justify-content:flex-start;}
+  .vmTog:hover{background:var(--surface);}
+  .vmReset{display:block;width:100%;text-align:left;font-size:13px;font-weight:450;color:var(--ink2);padding:9px 10px;border-radius:9px;}
+  .vmReset:hover{background:var(--surface);color:var(--ink);}
+  .tog{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:450;color:var(--ink2);white-space:nowrap;}
+  .sw{width:36px;height:21px;border-radius:20px;background:#D4D4D8;position:relative;transition:.18s var(--ease);flex-shrink:0;}
+  .sw.on{background:var(--blue);}
+  .sw i{position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.18s var(--ease);box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  .sw.on i{left:17px;}
+
+  .appwrap{max-width:1280px;margin:0 auto;}
+  .app{background:var(--white);position:relative;min-height:100dvh;display:flex;flex-direction:column;}
+  .stage{animation:rise .26s var(--ease);flex:1;display:flex;flex-direction:column;}
+  .stage>.main,.stage>.body,.stage>.sup{flex:1;}
+  @keyframes rise{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+  .strip{display:flex;align-items:center;gap:14px;padding:11px 18px;background:#28282C;border-bottom:1px solid rgba(0,0,0,.12);flex-wrap:wrap;position:relative;}
+  .strip .who{display:flex;align-items:center;gap:9px;font-size:13.5px;color:rgba(255,255,255,.8);}
+  .strip .who b{font-weight:600;color:#fff;}
+  .strip .tm{font-size:14px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:0;}
+  .cbtn{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);color:#fff;display:flex;align-items:center;justify-content:center;transition:.14s var(--ease);}
+  .cbtn:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.22);}.cbtn:active{transform:scale(.94);}
+  .cbtn.on{background:#fff;color:#28282C;border-color:#fff;}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;}
+  .pill.avail{background:var(--green-bg);color:var(--green-tx);}
+  .pill.oncall{background:rgba(255,255,255,.18);color:#fff;}
+  .pdot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .pill.oncall .pdot,.pill.avail .pdot{animation:blip 1.6s var(--ease) infinite;}
+  @keyframes blip{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  .body{display:grid;grid-template-columns:252px 1fr;min-height:580px;}
+  .rail{border-right:1px solid var(--line);padding:18px 14px 14px;display:flex;flex-direction:column;background:#FAFAFA;}
+  .rail .lab{font-size:12.5px;color:var(--ink2);font-weight:500;margin:0 8px 12px;}
+  .qi{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13.5px;color:var(--ink2);transition:.13s var(--ease);}
+  .qi:hover{background:#F1F1F2;}
+  .qi.on{background:var(--blue-soft);color:var(--ink);font-weight:500;}
+  .qi .bdg{font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:11px;background:#EDEDEE;color:var(--ink3);font-variant-numeric:tabular-nums;}
+  .qi .bdg.fill{background:var(--ink);color:#fff;}
+  .qi .bdg.soft{background:#fff;border:1px solid var(--line2);color:var(--ink3);font-weight:450;}
+  .qi.full{color:var(--blue);font-weight:600;}
+  .qi.full .bdg{background:var(--blue);color:#fff;}
+  .rail .tr{margin-top:16px;padding-top:15px;border-top:1px solid var(--line);flex:1;min-height:90px;}
+  .tr .who{font-size:11px;font-weight:600;color:var(--ink3);margin:0;}
+  .tr p.q{font-size:12.5px;line-height:1.5;margin:2px 0 11px;color:var(--ink2);}
+  .tr .ph{font-size:12.5px;color:var(--ink3);font-style:italic;}
+  .foot{display:flex;align-items:center;gap:9px;padding:12px 8px 2px;margin-top:8px;border-top:1px solid var(--line);}
+  .orb{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#7FB8D6,#0C6E99 78%);box-shadow:0 1px 3px rgba(35,131,226,.4);}
+  .foot .nm{font-size:13.5px;font-weight:600;flex:1;}
+  .foot .icb{color:var(--ink3);padding:4px;border-radius:6px;transition:.13s;}
+  .foot .icb:hover{background:#EDEDEE;color:var(--ink2);}
+
+  .main{padding:22px 26px;}
+  .phead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
+  .pname{display:flex;align-items:center;gap:13px;}
+  .pname .n{font-size:16px;font-weight:600;}
+  .pname .div{width:1px;height:18px;background:var(--line2);}
+  .pname .m{font-size:13.5px;color:var(--ink2);}
+  .acts{display:flex;align-items:center;gap:9px;}
+  .btn{font-size:13.5px;font-weight:500;padding:9px 15px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:8px;transition:.14s var(--ease);}
+  .btn:hover{border-color:var(--ink3);background:#FAFAFA;}.btn:active{transform:scale(.98);}
+  .btn.pri{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .btn.pri:hover{background:var(--blue-d);border-color:var(--blue-d);}
+  .btn.rec.on{background:var(--red);border-color:var(--red);color:#fff;}
+  .recOn{border-color:#f0c4c0;color:var(--red);background:var(--red-soft);}
+  .recOn:hover{border-color:var(--red);background:#FCE3E0;}
+  .recdot{width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;animation:blip 1.3s var(--ease) infinite;}
+  .rectime{font-variant-numeric:tabular-nums;}
+  .body{min-height:0;}
+  .body>.rail{overflow-y:auto;min-height:0;}
+  .visitMain{display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+  .visitMain .phead{flex-shrink:0;}
+  .qscroll{flex:1;min-height:0;overflow-y:auto;}
+
+  .sectit{display:flex;align-items:center;gap:11px;margin:0 0 14px;}
+  .sectit .t{font-size:17px;font-weight:600;letter-spacing:-.01em;}
+  .sectit .bdg{font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:11px;background:var(--ink);color:#fff;}
+  .sectit .bdg.soft{background:#EDEDEE;color:var(--ink3);}
+  .sectit .bdg.full{background:var(--blue);color:#fff;}
+
+  .qcard{display:flex;align-items:flex-start;gap:13px;padding:15px 17px;border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:10px;cursor:pointer;transition:.15s var(--ease);background:#fff;}
+  .qcard:hover{border-color:var(--line2);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .qcard.done{background:var(--surface);border-color:var(--line2);}
+  .ck{width:21px;height:21px;border-radius:6px;border:2px solid var(--line2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;color:#fff;transition:.15s var(--ease);}
+  .qcard:hover .ck{border-color:var(--ink3);}
+  .qcard.done .ck{background:var(--blue);border-color:var(--blue);animation:pop .22s var(--ease);}
+  @keyframes pop{0%{transform:scale(.6);}60%{transform:scale(1.12);}100%{transform:scale(1);}}
+  .qcard .qt{font-size:14.5px;line-height:1.55;}
+  .qcard.done .qt{color:var(--ink2);}
+
+  /* queue */
+  .qhead{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+  .qhead h2{font-size:19px;font-weight:600;letter-spacing:-.015em;margin:0;}
+  .qhead .stats{font-size:13.5px;color:var(--ink2);margin-top:5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .qhead .stats b{color:var(--ink);font-weight:600;}
+  .qhead .stats .sep{color:var(--line2);}
+  .queue{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .qtabs{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface);}
+  .qtab{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:6px 12px;border-radius:7px;color:var(--ink2);transition:.14s var(--ease);}
+  .qtab.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);}
+  .qtab .c{font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:#E4E4E7;color:var(--ink2);}
+  .qtab.on .c{background:var(--ink);color:#fff;}
+  /* Notion-database-style view tabs (retrieval) */
+  .ntabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin-bottom:18px;flex-wrap:wrap;}
+  .ntabs button{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;color:var(--ink3);padding:0 0 11px;margin-bottom:-1px;border-bottom:2px solid transparent;transition:.14s var(--ease);white-space:nowrap;}
+  .ntabs button:hover{color:var(--ink2);}
+  .ntabs button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink);}
+  .ntabs .c{font-size:11px;font-weight:600;min-width:19px;text-align:center;padding:1px 6px;border-radius:20px;background:#EFEFF0;color:var(--ink3);}
+  .ntabs button.on .c{background:var(--ink);color:#fff;}
+  .qr{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid rgba(0,0,0,.05);transition:.13s var(--ease);}
+  .qr:last-child{border-bottom:0;}
+  .qr:hover{background:var(--surface);}
+  .qr.next{background:var(--blue-softer);}
+  .qr .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+  .qr .mid{flex:1;min-width:0;}
+  .qr .r1{display:flex;align-items:center;gap:9px;flex-wrap:wrap;line-height:1.25;}
+  .qr .nm{font-size:14px;font-weight:600;letter-spacing:-.01em;}
+  .qr .r2{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin-top:5px;}
+  .homeMain{display:flex;flex-direction:column;overflow:hidden;}
+  .homeMain .greet{flex-shrink:0;}
+  .homeMain>.fz{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .homeMain .queue{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .homeMain .qtabs{flex-shrink:0;}
+  .qlist{flex:1;min-height:0;overflow-y:auto;}
+  .ntag{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:2px 8px;border-radius:4px;line-height:1.45;white-space:nowrap;}
+  .ntag.pomona{background:#DDEBF1;color:#0C6E99;}
+  .ntag.rhode{background:#DDEDEA;color:#0E7B6C;}
+  .ntag.street{background:#EAE3F2;color:#693FA5;}
+  .ntag.amber{background:#FAEBDD;color:#D9730B;}
+  .ntag.slate{background:#EBECED;color:#57575C;}
+  .ntag.gray{background:#EBECED;color:#57575C;}
+  .ntag.teal{background:#DDEDEA;color:#0E7B6C;}
+  .qctx{font-size:12.5px;color:var(--ink3);margin-top:6px;}
+  .lbl{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:450;color:var(--ink2);}
+  .ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .ldot.es{background:#D9730B;}
+  .ldot.en{background:#0C6E99;}
+  .qr .meta{font-size:12.5px;color:var(--ink3);}
+  .doc{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--ink);}
+  .docav{width:20px;height:20px;border-radius:50%;background:#DDEDEA;color:#0E7B6C;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;flex-shrink:0;}
+  .qr .right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+  .qr .big{font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .qr .big.long{color:var(--amber);}
+  .qr .sm{font-size:11.5px;color:var(--ink3);}
+  .skill{font-size:11px;font-weight:500;padding:2px 9px;border-radius:11px;}
+  .skill.es{background:var(--amber-bg);color:var(--amber-tx);}
+  .skill.en{background:var(--chip-bg);color:var(--chip-tx);}
+  .dir{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:2px 9px;border-radius:11px;}
+  .dir.in{background:#DDEBF1;color:#0C6E99;}
+  .dir.out{background:var(--purple-bg);color:var(--purple-tx);}
+  .tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:5px;letter-spacing:.02em;}
+  .tag.urgent{background:var(--red-soft);color:var(--red-tx);}
+  .tag.attempt{background:#EDEDEE;color:var(--ink2);}
+  .tag.next{background:var(--ink);color:#fff;}
+
+  .greet{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
+  .greet h1{font-size:30px;font-weight:700;letter-spacing:-.032em;margin:0;line-height:1.08;}
+  .greetEy{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:9px;}
+  .greetSub{font-size:14px;color:var(--ink2);margin-top:11px;}
+  .greetSub b{color:var(--ink);font-weight:600;}
+  .greet .sched{font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.55;max-width:580px;}
+  .greet .sched b{color:var(--ink);font-weight:600;}
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:8px 13px;border-radius:10px;border:1px solid var(--line2);background:#fff;transition:.14s var(--ease);}
+  .status:hover{border-color:var(--ink3);}
+  .status .sd{width:8px;height:8px;border-radius:50%;}
+  .statusWrap{display:flex;align-items:center;gap:10px;}
+  .statusLab{font-size:12.5px;font-weight:500;color:var(--ink3);}
+  .status.avail .sd{background:var(--green);}
+  .status.brk .sd{background:var(--amber);}
+  .status svg{color:var(--ink3);}
+  .mkt{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:2px 9px;border-radius:11px;background:#EFEFF0;color:var(--ink2);}
+  .mkt svg{opacity:.65;}
+  .qr .sub{font-size:12px;color:var(--ink3);}
+  .qr .time{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums;}
+  .metaLine{display:flex;align-items:center;flex-wrap:wrap;gap:0;font-size:12.5px;color:var(--ink3);}
+  .metaLine .sep{margin:0 8px;color:#C1C6CF;}
+  .qr .time.long{color:var(--amber);font-weight:600;}
+  .callbtn{font-size:13px;font-weight:500;padding:6px 14px;border-radius:8px;background:var(--blue);border:1px solid var(--blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:98px;height:30px;transition:.14s var(--ease);}
+  .callbtn:hover{background:var(--blue-d);border-color:var(--blue-d);}.callbtn:active{transform:scale(.97);}
+  .callbtn.ans{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .callbtn.ans:hover{background:var(--blue-d);border-color:var(--blue-d);}
+
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.42);backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:6vh 26px 26px;z-index:40;animation:fade .2s var(--ease);overflow-y:auto;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  .modal{background:#fff;border-radius:18px;width:536px;max-width:100%;padding:28px 30px;max-height:88vh;overflow:auto;box-shadow:var(--shadow-pop);animation:popin .26s var(--ease);}
+  @keyframes popin{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:none;}}
+  .modal h2{font-size:22px;font-weight:600;margin:0 0 5px;letter-spacing:-.015em;}
+  .modal .lead{font-size:14px;color:var(--ink2);margin:0 0 22px;}
+  .prev{border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;background:var(--surface);}
+  .prev .l{font-size:14px;font-weight:600;}.prev .s{font-size:12.5px;color:var(--ink2);margin-top:4px;}
+  .chk{width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .vt{display:grid;grid-template-columns:1fr 1fr;gap:5px;background:#EFEFF0;border-radius:11px;padding:4px;margin-bottom:20px;}
+  .vt div{padding:11px;text-align:center;font-size:14px;font-weight:500;color:var(--ink2);border-radius:8px;transition:.14s var(--ease);}
+  .vt div.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+  .fld label{font-size:13px;font-weight:500;display:block;margin-bottom:7px;}
+  .fld .v{font-size:14px;border:1px solid var(--line2);border-radius:9px;padding:11px 13px;background:#fff;display:flex;align-items:center;justify-content:space-between;min-height:42px;}
+  .fld .v.ro{background:var(--surface);}
+  .fld .v svg{color:var(--ink3);}
+  .mact{display:flex;justify-content:space-between;align-items:center;margin-top:26px;}
+
+  .reason{border:1px solid var(--line);border-radius:13px;padding:15px 16px;margin-bottom:11px;display:flex;gap:13px;align-items:flex-start;cursor:pointer;transition:.14s var(--ease);}
+  .reason:hover{border-color:var(--line2);}
+  .reason.sel{border-color:var(--ink);background:var(--surface);}
+  .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--line2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:.14s var(--ease);}
+  .reason.sel .rad{border-color:var(--ink);}
+  .reason.sel .rad::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--ink);animation:pop .2s var(--ease);}
+  .reason .rt{font-size:14.5px;font-weight:600;}
+  .reason .rs{font-size:12.5px;color:var(--ink2);margin-top:3px;}
+
+  .incoming{width:430px;max-width:100%;background:#fff;border-radius:20px;padding:30px 28px 24px;text-align:center;box-shadow:var(--shadow-pop);animation:popin .28s var(--ease);position:relative;}
+  .incoming .ring{width:72px;height:72px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;animation:pulse 1.5s var(--ease) infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(35,131,226,.3);}70%{box-shadow:0 0 0 18px rgba(35,131,226,0);}100%{box-shadow:0 0 0 0 rgba(35,131,226,0);}}
+  .incoming .lab{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:9px;}
+  .incoming .n{font-size:21px;font-weight:600;letter-spacing:-.01em;}
+  .incoming .d{font-size:13.5px;color:var(--ink2);margin:6px 0 22px;}
+  .incoming .row{display:flex;gap:12px;}
+  .incoming .row .btn{flex:1;justify-content:center;padding:13px;font-size:14.5px;}
+  .btn.decline{border-color:var(--line2);color:var(--ink2);}
+  .btn.decline:hover{border-color:var(--red);color:var(--red);background:var(--red-soft);}
+  .btn.accept{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .btn.accept:hover{background:var(--blue-d);border-color:var(--blue-d);}
+
+  .stab{display:inline-flex;background:#EFEFF0;border-radius:9px;padding:3px;gap:2px;}
+  .stab button{font-size:13px;font-weight:500;padding:7px 16px;border-radius:7px;color:var(--ink2);transition:.15s var(--ease);}
+  .stab button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);}
+  .stat{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);}
+  .stat .l{font-size:13px;color:var(--ink2);}.stat .v{font-size:14px;font-weight:600;}
+  .brief{border:1px solid var(--line);border-radius:14px;padding:26px 28px;max-width:660px;}
+  .brief h4{font-size:16px;font-weight:600;margin:22px 0 8px;letter-spacing:-.01em;}
+  .brief h4:first-child{margin-top:0;}
+  .brief p{font-size:14px;line-height:1.75;color:#3A3A3D;margin:0;}
+  .term{background:var(--chip-bg);color:var(--chip-tx);padding:1px 6px;border-radius:5px;font-weight:500;white-space:nowrap;}
+
+  .sup{padding:24px 26px;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+  .supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .sup .h{font-size:18px;font-weight:600;letter-spacing:-.015em;margin:2px 0 4px;}
+  .sup .sub{font-size:13.5px;color:var(--ink2);margin:0;}
+  .supActions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end;}
+  .panelHd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .selectMini{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--ink2);border:1px solid var(--line2);background:#fff;border-radius:8px;padding:5px 8px;transition:.14s var(--ease);}
+  .selectMini:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+  .callCount{font-weight:600;text-align:right;font-variant-numeric:tabular-nums;}
+  .thRight{text-align:right;}
+  .supBtn{height:34px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:0 12px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--ink2);transition:.14s var(--ease);white-space:nowrap;}
+  .supBtn:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+  .supBtn.pri{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px;}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0;}
+  .kpi .l{font-size:12px;color:var(--ink2);margin:0;white-space:nowrap;}
+  .kpi .v{font-size:24px;font-weight:600;margin:6px 0 0;letter-spacing:-.02em;}
+  .kpi .hint{font-size:11.5px;color:var(--ink3);margin-top:3px;}
+  .srow{display:grid;grid-template-columns:1.35fr 1.15fr;gap:15px;min-height:0;flex:1;}
+  .panel{border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-height:0;overflow:hidden;}
+  .panel h4{font-size:13.5px;font-weight:600;margin:0 0 4px;}
+
+  .panelHd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;}
+  .selectMini{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;white-space:nowrap;}
+  .callCount{font-size:13px;font-weight:600;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;}
+  .panelSub{font-size:12px;color:var(--ink3);margin:0 0 10px;}
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;color:var(--ink3);padding:0 0 8px;border-bottom:1px solid var(--line);}
+  th.num,td.num{text-align:right;}
+  .arow td{padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  .arow:last-child td{border-bottom:0;}
+  .agent{display:flex;align-items:center;gap:11px;}
+  .agent .agentMeta{font-size:12px;color:var(--ink3);margin-top:2px;}
+  .av{display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;}
+  .stt{font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:11px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .mon{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);color:var(--ink3);display:inline-flex;align-items:center;justify-content:center;margin-left:6px;transition:.14s var(--ease);}
+  .mon:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+
+  .sup{padding:24px 26px;overflow:auto;}
+  .supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .supGreet{font-size:28px;font-weight:700;letter-spacing:-.03em;margin:0 0 8px;line-height:1.1;}
+  .sup .h{font-size:20px;font-weight:600;letter-spacing:-.018em;margin:0 0 4px;}
+  .sup .sub{font-size:13.5px;color:var(--ink2);margin:0;line-height:1.45;}
+  .supActions{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+  .histBtn{font-size:13px;font-weight:500;padding:8px 12px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:8px;transition:.14s var(--ease);}
+  .histBtn:hover{border-color:var(--ink3);background:var(--surface);}
+  .filterBtn{font-size:13px;font-weight:500;padding:8px 11px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--ink2);display:inline-flex;align-items:center;gap:7px;}
+  .metricRows{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+  .metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .metricLabel{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:0 0 7px;}
+  .metric.call{background:#fff;}
+  .metric{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:14px 16px;min-height:88px;}
+  .metric .l{font-size:12.5px;color:var(--ink2);margin:0;}
+  .metric .v{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:6px 0 0;}
+  .metric .hint{font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.35;}
+  .supBody{display:flex;flex-direction:column;gap:15px;align-items:stretch;}
+  .panelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .panelHead h4{font-size:13.5px;font-weight:600;margin:0 0 4px;}
+  .panelHead .desc{font-size:12px;color:var(--ink3);margin:0;line-height:1.45;}
+  .agentTable th,.agentTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:11px 0;vertical-align:middle;}
+  .agentTable th{font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;padding-top:0;}
+  .agentTable tr:last-child td{border-bottom:0;}
+  .callsNum{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .listenBtn{height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;transition:.14s var(--ease);}
+  .listenBtn:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+  .listenBtn[disabled]{opacity:.35;cursor:not-allowed;}
+  .queueTable th,.queueTable td{font-size:13.5px;text-align:left;border-bottom:1px solid var(--line);padding:14px 0;vertical-align:middle;}
+  .queueTable th{font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;padding-top:0;}
+  .queueTable tr:last-child td{border-bottom:0;}
+  .patientCell{display:flex;align-items:center;gap:10px;min-width:0;}
+  .patientCell .name{font-weight:600;white-space:nowrap;}
+  .patientCell .under{font-size:12px;color:var(--ink3);margin-top:3px;white-space:nowrap;}
+  .routeTxt{font-size:12.5px;color:var(--ink2);white-space:nowrap;}
+  .startScope{height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:.14s var(--ease);white-space:nowrap;}
+  .startScope:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+  .startScope.pri{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .startScope.pri:hover{background:var(--blue-d);border-color:var(--blue-d);}
+  .waitText{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .waitText.long{color:var(--amber);}
+  .superNote{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:12px;padding:11px 13px;background:var(--surface);border-radius:10px;border:1px solid var(--line);}
+  .mon.big{width:auto;min-width:74px;padding:0 10px;gap:7px;font-size:12.5px;font-weight:500;}
+  .cbList{display:flex;flex-direction:column;border-top:1px solid var(--line);}
+  .cb{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  .cb:last-child{border-bottom:0;}
+  .cb .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .cb .nm{font-size:13.5px;font-weight:600;}
+  .cb .meta{font-size:12px;color:var(--ink3);margin-top:4px;}
+  .cb .owner{font-size:12px;color:var(--ink2);margin-top:5px;}
+  .cb .side{display:flex;flex-direction:column;align-items:flex-end;gap:7px;}
+  .miniBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:500;padding:6px 9px;border-radius:7px;border:1px solid var(--line2);background:#fff;color:var(--ink2);transition:.14s var(--ease);white-space:nowrap;}
+  .miniBtn:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
+
+  /* simple flex tags — just a small label, nothing else */
+  .fz{position:relative;}
+  .ftag{display:none;}
+  .tdot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+  body.fx .ftag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:20px;background:var(--chip-bg);color:var(--chip-tx);}
+  body.fx .ftag.block{display:flex;width:max-content;margin:0 0 12px;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:14px;padding:11px 13px;background:var(--blue-softer);border-radius:10px;}
+  body:not(.fx) .fxnote{display:none;}
+  .note .ni{color:var(--ink3);flex-shrink:0;margin-top:1px;}
+
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(8px);background:#1A1A1A;color:#fff;font-size:13.5px;padding:12px 18px;border-radius:11px;box-shadow:var(--shadow-pop);z-index:80;opacity:0;transition:.22s var(--ease);pointer-events:none;display:flex;align-items:center;gap:9px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px;}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  @media(max-width:780px){.body{grid-template-columns:1fr;}.rail{display:none;}.kpis,.metricGrid{grid-template-columns:repeat(2,1fr);}.srow,.supBody{grid-template-columns:1fr;}.main,.sup{padding:18px 16px;}}
+
+  /* ── appointment confirmation + requested records (in-visit) ── */
+  .apptBlk{border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px;margin-bottom:14px;background:#fff;}
+  .apptBlk .h{font-size:14.5px;font-weight:600;margin:0 0 4px;}
+  .apptBlk .sub{font-size:12.5px;color:var(--ink3);margin:0 0 13px;line-height:1.5;}
+  .confSeg{display:inline-flex;gap:8px;flex-wrap:wrap;}
+  .confSeg button{padding:8px 15px;border-radius:8px;border:1px solid var(--line2);background:#fff;font-size:13px;font-weight:500;color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.14s var(--ease);}
+  .confSeg button:hover{border-color:var(--ink3);color:var(--ink);}
+  .confSeg button svg{opacity:.55;}
+  .confSeg button.on{font-weight:600;}
+  .confSeg button.on svg{opacity:1;}
+  .confSeg button.on.yes{background:var(--green-bg);border-color:var(--green-bg);color:var(--green-tx);}
+  .confSeg button.on.no{background:var(--red-soft);border-color:var(--red-soft);color:var(--red-tx);}
+  .resched{margin-top:13px;animation:rise .2s var(--ease);}
+  .resched label{font-size:12.5px;font-weight:500;display:block;margin-bottom:7px;}
+  .resched textarea{width:100%;font-family:inherit;font-size:13.5px;line-height:1.5;border:1px solid var(--line2);border-radius:9px;padding:10px 12px;resize:vertical;min-height:62px;color:var(--ink);background:#fff;}
+  .resched textarea:focus{outline:none;border-color:var(--blue);}
+  .resched textarea::placeholder{color:var(--ink3);}
+  .recItem{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .recItem:last-of-type{border-bottom:0;}
+  .recItem .ri{flex:1;min-width:0;}
+  .recItem .rn{font-size:13.5px;font-weight:500;}
+  .recItem .rsrc{font-size:12px;color:var(--ink3);margin-top:3px;}
+  .recItem .ract{display:flex;align-items:center;gap:7px;flex-shrink:0;}
+  .miniBtn.pri{border-color:var(--blue);background:var(--blue);color:#fff;}
+  .miniBtn.pri:hover{border-color:var(--blue-d);background:var(--blue-d);color:#fff;}
+  .chipDone{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:5px 10px;border-radius:8px;}
+  .chipDone.has{background:var(--green-bg);color:var(--green-tx);}
+  .chipDone.q{background:var(--blue-soft);color:var(--blue-d);}
+  .undo{font-size:12px;color:var(--ink3);padding:5px 7px;border-radius:6px;}
+  .undo:hover{background:#EDEDEE;color:var(--ink2);}
+
+  /* ── record retrieval view ── */
+  .rtPatient{font-weight:600;white-space:nowrap;}
+  .rtRec{font-size:12.5px;color:var(--ink2);margin-top:3px;}
+  .rtBy{font-size:11.5px;color:var(--ink3);margin-top:3px;}
+  .rtSub{font-size:12px;color:var(--ink3);margin-top:5px;font-variant-numeric:tabular-nums;}
+  .rtSrcName{font-size:13.5px;}
+  .rtContact{font-size:12.5px;color:var(--ink2);margin-top:5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-variant-numeric:tabular-nums;}
+  .methodTag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;}
+  .methodTag.portal{background:var(--purple-bg);color:var(--purple-tx);}
+  .methodTag.phone{background:#DDEBF1;color:#0C6E99;}
+  .methodTag.fax{background:var(--amber-bg);color:var(--amber-tx);}
+  .newTag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--ink);color:#fff;letter-spacing:.02em;vertical-align:middle;margin-right:6px;}
+  .rtActs{display:flex;align-items:center;gap:7px;justify-content:flex-end;flex-wrap:wrap;}
+  .goBtn{height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:.14s var(--ease);white-space:nowrap;}
+  .goBtn:hover{border-color:var(--blue-d);color:#fff;background:var(--blue-d);}
+  .goBtn:active{transform:scale(.97);}
+  .rtDone{font-size:12.5px;color:var(--green-tx);display:inline-flex;align-items:center;gap:6px;font-weight:500;}
+  .statusSel{appearance:none;-webkit-appearance:none;font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 30px 7px 12px;border-radius:8px;border:1px solid var(--line2);background-color:#fff;color:var(--ink2);cursor:pointer;transition:.14s var(--ease);background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235B616E' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+  .statusSel:hover{border-color:var(--ink3);}
+  .statusSel:focus{outline:none;border-color:var(--blue);}
+  .statusSel.s-contacted{background-color:#DDEBF1;border-color:#C3DDEC;color:#0C6E99;}
+  .statusSel.s-awaiting{background-color:var(--amber-bg);border-color:#EFD9BD;color:var(--amber-tx);}
+  .statusSel.s-received{background-color:var(--green-bg);border-color:#C6E1DB;color:var(--green-tx);}
+  .statusSel.s-unsuccessful{background-color:var(--red-soft);border-color:#F2CFCD;color:var(--red-tx);}
+  .statusSel option{background:#fff;color:var(--ink);font-weight:500;}
+  .recpill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:#fff;background:#E03D3E;padding:4px 10px;border-radius:20px;letter-spacing:.02em;font-variant-numeric:tabular-nums;}
+  .recpill .recdot{width:8px;height:8px;border-radius:50%;background:#fff;display:inline-block;animation:blip 1.3s var(--ease) infinite;}
+  .modalWide{width:600px;}
+  .recNote{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--red-tx);}
+  .recNote svg{color:var(--red);}
+  .stepHead{margin-bottom:16px;}
+  .stepEy{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);}
+  .stepHead h3{font-size:18px;font-weight:600;margin:6px 0 4px;letter-spacing:-.01em;}
+  .stepHead p{font-size:13px;color:var(--ink2);margin:0;line-height:1.5;}
+  .stepFoot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+  .notRecNote{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3);font-weight:500;}
+  .notRecNote svg{color:var(--ink3);}
+  .vtog{display:inline-flex;gap:22px;margin:2px 0 20px;border-bottom:1px solid var(--line);}
+  .vtog button{font-size:13.5px;font-weight:500;color:var(--ink3);padding:0 0 10px;margin-bottom:-1px;border-bottom:2px solid transparent;transition:.14s var(--ease);}
+  .vtog button:hover{color:var(--ink2);}
+  .vtog button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="appwrap"><div class="app" id="app"></div></div>
+
+<div class="viewMenu" id="viewMenu" hidden>
+  <div class="vmLabel">Switch view</div>
+  <button class="vmItem on" data-role="agent"><span class="vmTick"></span>Agent</button>
+  <button class="vmItem" data-role="supervisor"><span class="vmTick"></span>Manager</button>
+  <button class="vmItem" data-role="retrieval"><span class="vmTick"></span>Retrieval</button>
+  <div class="vmDiv"></div>
+  <button class="tog vmTog" id="fxTog" type="button"><span class="sw" id="fxSw"><i></i></span>Show Flex tags</button>
+  <button class="reset vmReset" id="resetBtn">Reset prototype</button>
+</div>
+<button class="viewFab" id="viewFab" aria-haspopup="true" aria-expanded="false">
+  <svg class="vfIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  <span class="vfLabel" id="vfLabel">Agent</span>
+  <svg class="vfChev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+<div class="viewScrim" id="viewScrim" hidden></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ICN={
+ phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
+ micOff:'<line x1="2" x2="22" y1="2" y2="22"/><path d="M18.9 13.2A7 7 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.3V5a3 3 0 0 0-5.7-1.3"/><path d="M9 9v3a3 3 0 0 0 5.1 2.1"/><line x1="12" x2="12" y1="19" y2="22"/>',
+ pause:'<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+ transfer:'<path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/>',
+ headphones:'<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+ userPlus:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ chevDown:'<path d="m6 9 6 6 6-6"/>',
+ calendar:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+ clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+ printer:'<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
+ help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+ user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ panel:'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+ phoneIn:'<polyline points="15 2 15 8 21 8"/><line x1="21" x2="15" y1="2" y2="8"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ phoneOut:'<polyline points="16 8 22 8 22 2"/><line x1="16" x2="22" y1="8" y2="2"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+ pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+ zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+ external:'<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+ arrowR:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+ clapper:'<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+ barChart:'<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/>'
+};
+function ic(n,s,c){return `<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;}
+function twilioIcon(s){const z=s||16;return `<svg width="${z}" height="${z}" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#F22F46"/><circle cx="11" cy="11" r="2.7" fill="#fff"/><circle cx="21" cy="21" r="2.7" fill="#fff"/><circle cx="21" cy="11" r="2.7" fill="#fff"/><circle cx="11" cy="21" r="2.7" fill="#fff"/></svg>`;}
+const AVC=[['#DDEBF1','#0C6E99'],['#FAEBDD','#D9730B'],['#DDEDEA','#0E7B6C'],['#EAE3F2','#693FA5'],['#F4DFEB','#AD1972'],['#FBF3DA','#DFAB00']];
+function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function avc(n){let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%AVC.length;return AVC[h];}
+function avatar(n,sz){const[bg,fg]=avc(n);return `<span class="av" style="width:${sz||32}px;height:${sz||32}px;border-radius:50%;font-size:${(sz||32)<34?'11.5px':'13px'};background:${bg};color:${fg}">${initials(n)}</span>`;}
+
+const SECTIONS=[
+ {k:'hpi',n:'History of present illness',q:[
+  ["Can you point to where exactly on your chest you're experiencing this pain?","It's right in the center, behind my breastbone."],
+  ["Does the pain radiate anywhere, such as to your back, arms, or neck?","Sometimes it goes down my left arm when I'm walking."],
+  ["Any other symptoms — shortness of breath, palpitations, dizziness, or fatigue?","Short of breath on stairs, and more tired than usual."],
+  ["When did you first notice the chest pain starting?","About a year ago."]
+ ]},
+ {k:'fu',n:'Follow up questions',badge:'Needs more info',q:[
+  ["Does the chest pressure ever wake you at night?","No, not at night."],
+  ["How long does a typical episode last?","Just a few minutes."]
+ ]},
+ {k:'ros',n:'Review of systems',q:[
+  ["Any changes in your appetite or weight recently?","No real changes."],
+  ["Any recent fevers, chills, or night sweats?","No."],
+  ["How have you been sleeping lately?","Okay, a little restless."],
+  ["Any changes in your bowel or urinary habits?","No."],
+  ["Any skin changes or rashes you've noticed?","No."]
+ ]},
+ {k:'pmh',n:'Past medical history',q:[
+  ["Any chronic conditions, like diabetes or high blood pressure?","Diabetes and high blood pressure."],
+  ["Any previous surgeries or hospital stays?","Gallbladder removed in 2015."],
+  ["Any allergies to medications?","None that I know of."],
+  ["When was your last physical or lab work?","Last summer."]
+ ]},
+ {k:'meds',n:'Medications',q:[
+  ["What medications are you currently taking?","Metformin and lisinopril."],
+  ["Are you taking them as prescribed?","Yes, most days."],
+  ["Any over-the-counter medicines or supplements?","A daily vitamin."],
+  ["Have you noticed any side effects?","No."]
+ ]},
+ {k:'fh',n:'Family history',q:[
+  ["Any heart disease in your immediate family?","My father had a heart attack."],
+  ["Any history of diabetes in the family?","Yes, my mother."],
+  ["Any cancer in the family?","No."],
+  ["Any other inherited conditions?","Not that I know of."]
+ ]},
+ {k:'sh',n:'Social history',q:[
+  ["Do you smoke or use tobacco?","I quit about five years ago."],
+  ["How often do you drink alcohol?","Only occasionally."],
+  ["Do you exercise regularly?","I walk a few times a week."],
+  ["Who do you live with at home?","My wife."]
+ ]},
+ {k:'dx',n:'Differential questions',q:[
+  ["Does the pain get worse with exertion?","Yes, walking uphill."],
+  ["Does it ease with rest?","Usually, yes."],
+  ["Any swelling in your legs or ankles?","A little by the end of the day."],
+  ["Have you felt your heart racing or skipping beats?","Once or twice."]
+ ]}
+];
+const TOTALQ=SECTIONS.reduce((s,x)=>s+x.q.length,0);
+const ansCount=k=>S.answered.filter(id=>id.split(':')[0]===k).length;
+const isAns=(k,i)=>S.answered.includes(k+':'+i);
+
+// outbound pre-visit calls to make today
+const QUEUE=[
+ {nm:"Michael Dia",sex:"Male",dob:"09/09/1974",age:51,phone:"(909) 808-4872",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"2:30 PM"},
+ {nm:"Lucia Ramos",sex:"Female",dob:"03/14/1969",age:56,phone:"(909) 555-0188",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"2:45 PM"},
+ {nm:"James Tran",sex:"Male",dob:"11/02/1960",age:64,phone:"(909) 555-0103",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"3:00 PM"},
+ {nm:"Maria Gonzalez",sex:"Female",dob:"06/18/1981",age:43,phone:"(909) 555-0211",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"3:15 PM"},
+ {nm:"David Okafor",sex:"Male",dob:"01/27/1978",age:47,phone:"(909) 555-0299",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"3:30 PM"},
+ {nm:"Yuki Tanaka",sex:"Female",dob:"08/05/1990",age:34,phone:"(909) 555-0247",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"3:45 PM"},
+ {nm:"Carlos Mendoza",sex:"Male",dob:"12/11/1965",age:59,phone:"(909) 555-0166",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"4:00 PM"},
+ {nm:"Aaliyah Johnson",sex:"Female",dob:"04/22/1986",age:39,phone:"(909) 555-0318",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"4:15 PM"},
+ {nm:"Fatima Noor",sex:"Female",dob:"10/30/1972",age:52,phone:"(909) 555-0274",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"4:30 PM"},
+ {nm:"Sofia Herrera",sex:"Female",dob:"02/09/1995",age:30,phone:"(909) 555-0290",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"4:45 PM"},
+ {nm:"Wei Chen",sex:"Male",dob:"07/16/1958",age:66,phone:"(909) 555-0135",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",sched:"5:00 PM"},
+ {nm:"Diego Flores",sex:"Male",dob:"05/03/1983",age:42,phone:"(909) 555-0342",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",sched:"5:15 PM"}
+];
+// inbound callbacks waiting
+const CALLBACKS=[
+ {nm:"Rosa Medina",sex:"Female",dob:"06/22/1968",age:56,phone:"(909) 555-0177",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",wait:"2:14",urgent:true},
+ {nm:"Daniel Park",sex:"Male",dob:"01/15/1984",age:41,phone:"(909) 555-0145",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"1:47",urgent:false},
+ {nm:"Aisha Khan",sex:"Female",dob:"09/30/1979",age:45,phone:"(909) 555-0162",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"1:12",urgent:false},
+ {nm:"Jorge Ramirez",sex:"Male",dob:"03/08/1971",age:54,phone:"(909) 555-0193",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",wait:"0:58",urgent:false},
+ {nm:"Linda Vu",sex:"Female",dob:"11/19/1988",age:36,phone:"(909) 555-0151",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"0:33",urgent:false},
+ {nm:"Priya Patel",sex:"Female",dob:"07/04/1992",age:32,phone:"(909) 555-0184",prov:"Dr. Waraich",type:"Primary care",skill:"en",market:"Pomona",wait:"0:19",urgent:false},
+ {nm:"Ahmed Hassan",sex:"Male",dob:"02/27/1976",age:49,phone:"(909) 555-0205",prov:"Dr. Waraich",type:"Primary care",skill:"es",market:"Pomona",wait:"0:05",urgent:false}
+];
+
+// records the doctor requested on the last After Visit Summary (pulled per patient)
+function avsRecords(){
+ return [
+  {id:'echo',name:'Echocardiogram report',source:'Pomona Cardiology — Dr. Reyes',method:'portal',portal:'Pomona Hospital portal',phone:'(909) 555-0700'},
+  {id:'ecg',name:'ECG & stress test results',source:'Pomona Cardiology — Dr. Reyes',method:'portal',portal:'Pomona Hospital portal',phone:'(909) 555-0700'},
+  {id:'labs',name:'Lipid panel & HbA1c',source:'Quest Diagnostics — Pomona',method:'portal',portal:'Quest Quanum portal',phone:'(866) 697-8378'},
+  {id:'consult',name:'Cardiology consult note',source:'Out-of-network specialist',method:'phone',phone:'(909) 555-0911'}
+ ];
+}
+// record retrieval queue — seeded so the team's metrics aren't empty
+// status: todo → contacted → awaiting → received | unsuccessful
+function seedRetrieval(){
+ return [
+  {id:'r1',patient:'Michael Dia',record:'Echocardiogram report',source:'Pomona Cardiology — Dr. Reyes',by:'Dr. Waraich',status:'todo',added:'9:02 AM',method:'portal',portal:'Pomona Hospital portal',phone:'(909) 555-0700'},
+  {id:'r2',patient:'Lucia Ramos',record:'Colonoscopy results',source:'IEHP GI — Dr. Okonkwo',by:'Dr. Waraich',status:'todo',added:'9:14 AM',method:'phone',phone:'(909) 555-0455'},
+  {id:'r3',patient:'James Tran',record:'Lipid panel & HbA1c',source:'Quest Diagnostics — Pomona',by:'Dr. Waraich',status:'contacted',added:'9:31 AM',lastContact:'9:36 AM',attempts:1,method:'portal',portal:'Quest Quanum portal',phone:'(866) 697-8378'},
+  {id:'r4',patient:'Rosa Medina',record:'Cardiology consult note',source:'Pomona Cardiology — Dr. Reyes',by:'Dr. Waraich',status:'awaiting',added:'8:47 AM',lastContact:'8:52 AM',attempts:1,method:'portal',portal:'Pomona Hospital portal',phone:'(909) 555-0700'},
+  {id:'r5',patient:'Maria Gonzalez',record:'MRI lumbar spine report',source:'RadNet Imaging — Claremont',by:'Dr. Waraich',status:'received',added:'8:20 AM',done:'8:33 AM',method:'portal',portal:'RadNet eRAD portal'},
+  {id:'r6',patient:'David Okafor',record:'Sleep study results',source:'SoCal Sleep Center',by:'Dr. Waraich',status:'received',added:'8:05 AM',done:'8:22 AM',method:'fax',fax:'(909) 555-0488',phone:'(909) 555-0480'},
+  {id:'r7',patient:'Carlos Mendoza',record:'Echocardiogram report',source:'Out-of-network specialist',by:'Dr. Waraich',status:'unsuccessful',added:'7:51 AM',reason:'No records release on file',method:'phone',phone:'(909) 555-0911'},
+  {id:'r8',patient:'Wei Chen',record:'Stress test results',source:'Out-of-network specialist',by:'Dr. Waraich',status:'todo',added:'9:40 AM',method:'phone',phone:'(909) 555-0922'}
+ ];
+}
+const RT_STATUS=[['todo','To do','To do'],['contacted','Contacted','Contacted'],['awaiting','Awaiting records','Awaiting'],['received','Received','Received'],['unsuccessful','Unsuccessful','Unsuccessful']];
+let RETRIEVAL=seedRetrieval();
+function addToRetrieval(p,r){
+ RETRIEVAL.unshift({id:'live-'+Date.now()+'-'+r.id,patient:p.nm,record:r.name,source:r.source,by:p.prov,status:'todo',added:'Just now',justAdded:true,method:r.method,portal:r.portal,phone:r.phone,fax:r.fax});
+}
+function removeFromRetrieval(p,r){
+ const i=RETRIEVAL.findIndex(x=>x.justAdded&&x.patient===p.nm&&x.record===r.name&&x.status==='todo');
+ if(i>=0)RETRIEVAL.splice(i,1);
+}
+// how this record gets retrieved — drives the contact button
+function contactInfo(r){
+ const m=r.method||'phone';
+ if(m==='portal')return {tag:'Portal',cls:'portal',icon:'external',label:'Open portal',line:r.portal||'Provider portal',toast:'Opening '+(r.portal||'provider portal')+' in a new tab'};
+ if(m==='fax')return {tag:'Fax',cls:'fax',icon:'printer',label:'Send fax request',line:r.fax?('Fax '+r.fax):'Records fax',toast:'Sending records request to '+(r.fax||'the clinic')};
+ return {tag:'Phone',cls:'phone',icon:'phone',label:'Call clinic',line:r.phone||'Clinic line',toast:'Dialing '+(r.phone||'the clinic')};
+}
+function contactSource(id){
+ const r=RETRIEVAL.find(x=>x.id===id);
+ if(!r)return;
+ toast(contactInfo(r).toast);
+ r.attempts=(r.attempts||0)+1;
+ r.lastContact='Just now';
+ if(r.status==='todo')r.status='contacted';
+ if(S.view==='retrieval')render();
+}
+
+let S,callInt=null,recInt=null;
+const fresh=()=>({view:'agent',screen:'available',modal:null,fx:false,qtab:'outbound',status:'Ready',active:null,muted:false,hold:false,aiRec:false,recPaused:false,callSec:0,recSec:0,reason:0,answered:[],sumTab:'brief',appt:null,reschedule:'',recReq:[],rtab:'todo',visitStep:'questions'});
+S=fresh();
+const app=document.getElementById('app');
+const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+function greeting(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening';}
+function todayLabel(){return new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
+function toast(t){const e=document.getElementById('toast');e.innerHTML=ic('zap',16,'#7FB8D6')+'<span>'+t+'</span>';e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200);}
+function stop(){if(callInt){clearInterval(callInt);callInt=null;}if(recInt){clearInterval(recInt);recInt=null;}}
+function runCall(){stop();S.callSec=0;callInt=setInterval(()=>{if(!S.hold){S.callSec++;const t=document.getElementById('callTimer');if(t)t.textContent=fmt(S.callSec);}},1000);}
+const P=()=>S.active||QUEUE[0];
+const lang=s=>s==='es'?'Spanish':'English';
+const MKT={'Pomona':'pomona','Rhode Island':'rhode','Street Med':'street'};
+function mkt(m){return `<span class="ntag ${MKT[m]||'gray'}">${m}</span>`;}
+function langtag(s){return `<span class="lbl"><span class="ldot ${s}"></span>${lang(s)}</span>`;}
+function langChip(s){return `<span class="ntag ${s==='es'?'amber':'slate'}">${lang(s)}</span>`;}
+function spanishBadge(s){return s==='es'?'<span class="ntag amber">Spanish</span>':'';}
+function waitSeconds(t){const [m='0',s='0']=String(t).split(':');return (parseInt(m,10)||0)*60+(parseInt(s,10)||0);}
+function isUrgentWait(t){return waitSeconds(t)>120;}
+function vtag(t){return `<span class="ntag gray">${t}</span>`;}
+function drtag(p){return `<span class="ntag teal">${p}</span>`;}
+function doctag(p){return `<span class="lbl"><span class="ldot doc"></span>${p}</span>`;}
+
+function strip(){
+ const p=P();
+ return `<div class="strip fz"><span class="ftag"><span class="tdot"></span>Flex</span>
+  <span class="who">${ic('phone',16,'rgba(255,255,255,.9)')} On call &nbsp;·&nbsp; <b>${p.nm}</b> &nbsp;·&nbsp; ${p.phone}</span>
+  <span class="tm" id="callTimer">0:00</span>
+  <span class="recpill" title="Twilio is recording this call"><span class="recdot"></span>Recording <span id="striprec">${fmt(S.recSec)}</span></span>
+  <span style="flex:1"></span>
+  <button class="cbtn ${S.muted?'on':''}" id="mute" aria-label="Mute">${ic(S.muted?'micOff':'mic',17)}</button>
+  <button class="cbtn ${S.hold?'on':''}" id="hold" aria-label="Hold">${ic('pause',17)}</button>
+  <button class="cbtn" id="xfer" aria-label="Transfer">${ic('transfer',17)}</button>
+  <span class="pill oncall"><span class="pdot"></span>On call</span>
+  <span style="font-size:12.5px;color:rgba(255,255,255,.9);font-weight:500">Amy Luna</span></div>`;
+}
+function startRecTimer(){if(recInt)clearInterval(recInt);recInt=setInterval(()=>{if(!S.recPaused){S.recSec++;const t=document.getElementById('rectime');if(t)t.textContent=fmt(S.recSec);const s=document.getElementById('striprec');if(s)s.textContent=fmt(S.recSec);}},1000);}
+function rail(){
+ let items='';
+ SECTIONS.forEach((s)=>{
+  const c=ansCount(s.k);
+  const full=c===s.q.length;
+  const bdg=s.badge?`<span class="bdg soft">${s.badge}</span>`:`<span class="bdg">${c}/${s.q.length}</span>`;
+  items+=`<div class="qi ${full?'full':''}"><span>${s.n}</span>${bdg}</div>`;
+ });
+ let tr='';
+ S.answered.forEach(id=>{const[k,i]=id.split(':');const sec=SECTIONS.find(s=>s.k===k);if(sec){const qq=sec.q[+i];tr+=`<p class="who">MA</p><p class="q">${qq[0]}</p><p class="who">PATIENT</p><p class="q">${qq[1]}</p>`;}});
+ if(!tr)tr='<p class="ph">Recording will transcribe the call here…</p>';
+ return `<div class="rail"><div class="lab">Questions</div>${items}
+  <div class="tr"><div class="lab" style="margin-left:0">Transcript</div>${tr}</div></div>`;
+}
+function questions(){
+ return SECTIONS.map(s=>{
+  const c=ansCount(s.k);
+  const bdg=s.badge?`<span class="bdg soft">${s.badge}</span>`:`<span class="bdg ${c===s.q.length?'full':(c>0?'':'soft')}">${c}/${s.q.length}</span>`;
+  const cards=s.q.map((qq,i)=>{const d=isAns(s.k,i);return `<div class="qcard ${d?'done':''}" data-k="${s.k}" data-i="${i}"><span class="ck">${d?ic('check',14):''}</span><span class="qt">${qq[0]}</span></div>`;}).join('');
+  return `<div class="sectit"><span class="t">${s.n}</span>${bdg}</div>${cards}`;
+ }).join('');
+}
+
+function apptPanel(){
+ const p=P();
+ const conf=S.appt;
+ const recReq=S.recReq||[];
+ const reschedUI = conf==='no'
+  ? `<div class="resched"><label>When would they like to reschedule?</label><textarea id="reschNote" placeholder="e.g. Prefers mornings after the 15th — call back Monday to rebook.">${S.reschedule||''}</textarea></div>`
+  : '';
+ const recRows = recReq.map(r=>{
+  let act;
+  if(r.status==='has')act=`<span class="chipDone has">${ic('check',13)} Patient has it</span><button class="undo" data-undo="${r.id}">Undo</button>`;
+  else if(r.status==='queued')act=`<span class="chipDone q">${ic('zap',12)} Added to retrieval queue</span><button class="undo" data-undo="${r.id}">Undo</button>`;
+  else act=`<button class="miniBtn" data-has="${r.id}">${ic('check',13)} Has it</button><button class="miniBtn pri" data-queue="${r.id}">${ic('userPlus',13)} Request</button>`;
+  return `<div class="recItem"><div class="ri"><div class="rn">${r.name}</div><div class="rsrc">${r.source}</div></div><div class="ract">${act}</div></div>`;
+ }).join('');
+ return `<div class="apptBlk"><div class="h">Is ${p.nm.split(' ')[0]} coming to the ${p.sched||'upcoming'} appointment?</div>
+   <div class="confSeg" id="confSeg" style="margin-top:11px"><button class="yes ${conf==='yes'?'on':''}" data-c="yes">${ic('check',15)} Confirmed</button><button class="no ${conf==='no'?'on':''}" data-c="no">Needs reschedule</button></div>
+   ${reschedUI}</div>
+  <div class="apptBlk"><div class="h">Requested records</div><div class="sub">From the last After Visit Summary — ${p.prov} asked for these.</div>${recRows}</div>`;
+}
+
+function queueRows(){
+ function meta(p){
+  const parts=[p.market,p.prov,p.type];
+  return `<div class="metaLine">${parts.map((part,idx)=>`${idx?'<span class="sep">·</span>':''}<span>${part}</span>`).join('')}</div>`;
+ }
+ if(S.qtab==='inbound'){
+  return CALLBACKS.map((c,i)=>{const urgent=isUrgentWait(c.wait);return `<div class="qr">${avatar(c.nm,38)}
+   <div class="mid"><div class="r1"><span class="nm">${c.nm}</span>${urgent?'<span class="tag urgent">Urgent</span>':''}${spanishBadge(c.skill)}</div>
+    <div class="r2">${meta(c)}</div></div>
+   <div class="right"><span class="time ${urgent?'long':''}">${c.wait} waiting</span>
+    <button class="callbtn ans" data-call="${i}">${ic('phoneIn',14)} Answer</button></div></div>`;}).join('');
+ }
+ return QUEUE.map((p,i)=>`<div class="qr">${avatar(p.nm,38)}
+  <div class="mid"><div class="r1"><span class="nm">${p.nm}</span>${spanishBadge(p.skill)}</div>
+   <div class="r2">${meta(p)}</div></div>
+  <div class="right"><span class="time">${p.sched}</span>
+   <button class="callbtn" data-call="${i}">${ic('phoneOut',14)} Call</button></div></div>`).join('');
+}
+
+
+function agent(){
+ if(S.screen==='available'){
+  app.innerHTML=`<div class="stage"><div class="main homeMain">
+   <div class="greet">
+    <div>
+     <div class="greetEy">${todayLabel()}</div>
+     <h1>${greeting()}, Amy</h1>
+     <p class="greetSub"><b>${QUEUE.length}</b> outbound calls to make · <b>${CALLBACKS.length}</b> waiting inbound</p>
+    </div>
+    <div class="statusWrap"><span class="statusLab">Status</span><button class="status ${S.status==='Ready'?'avail':'brk'}" id="statusBtn"><span class="sd"></span>${S.status} ${ic('chevDown',15)}</button></div>
+   </div>
+   <div class="fz"><span class="ftag block"><span class="tdot"></span>Flex · queue</span>
+    <div class="queue">
+     <div class="qtabs" id="qtabs">
+      <button class="qtab ${S.qtab==='outbound'?'on':''}" data-t="outbound">${ic('phoneOut',15)} Outbound <span class="c">${QUEUE.length}</span></button>
+      <button class="qtab ${S.qtab==='inbound'?'on':''}" data-t="inbound">${ic('phoneIn',15)} Inbound <span class="c">${CALLBACKS.length}</span></button>
+     </div>
+     <div class="qlist">${queueRows()}</div>
+    </div>
+   </div>
+  </div></div>`;
+  document.querySelectorAll('#qtabs .qtab').forEach(b=>b.onclick=()=>{S.qtab=b.dataset.t;render();});
+  document.getElementById('statusBtn').onclick=()=>{S.status=S.status==='Ready'?'On break':'Ready';toast('Status set to '+S.status);render();};
+  document.querySelectorAll('[data-call]').forEach(b=>b.onclick=()=>{S.active=(S.qtab==='inbound'?CALLBACKS:QUEUE)[+b.dataset.call];S.screen='startVisit';render();});
+ }
+ else if(S.screen==='inVisit'){
+  const p=P();
+  const onAppt=S.visitStep==='appt';
+  const recUI=S.aiRec
+   ?`<button class="btn recOn" id="rec"><span class="recdot"></span> Stop recording</button>`
+   :`<button class="btn" id="rec">${ic('mic',16)} Record</button>`;
+  const mainContent=onAppt?apptPanel():questions();
+  app.innerHTML=`<div class="stage">${strip()}<div class="body">${rail()}<div class="main visitMain">
+   <div class="phead"><div class="pname"><span class="n">${p.nm}</span><span class="div"></span><span class="m">${p.sex} · ${p.dob} · ${p.age}</span></div>
+    <div class="acts">${recUI}<button class="btn" id="end">End visit</button></div></div>
+   <div class="vtog" id="visitTabs"><button class="${onAppt?'':'on'}" data-vt="questions">Questions</button><button class="${onAppt?'on':''}" data-vt="appt">Admin</button></div>
+   <div class="qscroll">${mainContent}</div>
+  </div></div></div>`;
+  document.getElementById('end').onclick=()=>{if(S.appt==='no')S.reason=2;S.modal='endVisit';render();};
+  document.querySelectorAll('#visitTabs button').forEach(b=>b.onclick=()=>{S.visitStep=b.dataset.vt;render();});
+  const recBtn=document.getElementById('rec');if(recBtn)recBtn.onclick=()=>{S.aiRec=!S.aiRec;toast(S.aiRec?'Scope recording — transcribing for the summary':'Scope recording paused · the call is still recorded');render();};
+  document.querySelectorAll('.qcard').forEach(c=>c.onclick=()=>{const id=c.dataset.k+':'+c.dataset.i;S.answered.includes(id)?S.answered=S.answered.filter(x=>x!==id):S.answered.push(id);render();});
+  const cs=document.getElementById('confSeg');if(cs)cs.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.appt=b.dataset.c;render();});
+  const rn=document.getElementById('reschNote');if(rn)rn.oninput=e=>{S.reschedule=e.target.value;};
+  document.querySelectorAll('[data-has]').forEach(b=>b.onclick=()=>{const r=S.recReq.find(x=>x.id===b.dataset.has);if(r){r.status='has';}render();});
+  document.querySelectorAll('[data-queue]').forEach(b=>b.onclick=()=>{const r=S.recReq.find(x=>x.id===b.dataset.queue);if(r){r.status='queued';addToRetrieval(P(),r);toast('Added to retrieval queue');}render();});
+  document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{const r=S.recReq.find(x=>x.id===b.dataset.undo);if(r){if(r.status==='queued')removeFromRetrieval(P(),r);r.status='pending';}render();});
+  document.getElementById('mute').onclick=()=>{S.muted=!S.muted;render();};
+  document.getElementById('hold').onclick=()=>{S.hold=!S.hold;toast(S.hold?'Call on hold':'Call resumed');render();};
+  document.getElementById('xfer').onclick=()=>toast('Transfer — choose an agent or queue');
+ }
+ else if(S.screen==='summary'){
+  const p=P();
+  const brief=`<div class="brief">
+   <h4>Chief complaint</h4><p><span class="term">Chest pain</span> with <span class="term">shortness of breath on exertion</span>.</p>
+   <h4>History of present illness</h4><p>${p.age}-year-old ${p.sex.toLowerCase()} presents for a pre-visit assessment ahead of a primary care appointment with ${p.prov}. Reports <span class="term">central chest pressure</span> behind the sternum, intermittent over the past year, with <span class="term">radiation to the left arm</span> on exertion such as walking uphill, and relief with rest. Associated <span class="term">exertional dyspnea</span> on stairs and progressive <span class="term">fatigue</span>. Episodes last a few minutes and do not wake the patient at night. Denies <span class="term">syncope</span>.</p>
+   <h4>Review of systems</h4><p>Positive for <span class="term">chest pain</span>, <span class="term">exertional dyspnea</span>, <span class="term">fatigue</span>, occasional <span class="term">palpitations</span>, and mild end-of-day <span class="term">lower-extremity edema</span>. Denies fever, chills, night sweats, appetite or weight change, bowel or urinary changes, or rashes. Sleep mildly restless.</p>
+   <h4>Past medical history</h4><p><span class="term">Type 2 diabetes mellitus</span>, <span class="term">hypertension</span>, and <span class="term">hyperlipidemia</span>.</p>
+   <h4>Past surgical history</h4><p><span class="term">Cholecystectomy</span> (2015).</p>
+   <h4>Medications</h4><p><span class="term">Metformin</span>, <span class="term">lisinopril</span>, and a daily multivitamin. Reports good adherence with no side effects.</p>
+   <h4>Allergies</h4><p>No known drug allergies.</p>
+   <h4>Family history</h4><p>Father — <span class="term">myocardial infarction</span>. Mother — <span class="term">type 2 diabetes</span>. No known family history of cancer.</p>
+   <h4>Social history</h4><p>Former tobacco use, quit approximately 5 years ago. Occasional alcohol. Walks for exercise a few times weekly. Lives with spouse.</p>
+   <h4>Assessment</h4><p>${p.age}-year-old with multiple cardiovascular risk factors (<span class="term">diabetes</span>, <span class="term">hypertension</span>, <span class="term">hyperlipidemia</span>, family history of coronary disease, former smoker) presenting with exertional chest pressure radiating to the left arm and associated dyspnea — concerning for possible <span class="term">stable angina</span>. Differential includes <span class="term">coronary artery disease</span>, <span class="term">GERD</span>, and musculoskeletal pain.</p>
+   <h4>Plan</h4><p>Flagged for provider review prior to the visit. Recommend <span class="term">ECG</span> and labs (<span class="term">lipid panel</span>, <span class="term">HbA1c</span>, <span class="term">BMP</span>) at the appointment. Consider <span class="term">cardiology referral</span> or <span class="term">stress testing</span> per provider assessment. Continue current medications and review blood pressure control. Patient counseled on red-flag symptoms warranting urgent care.</p></div>`;
+  const transcript=`<div class="brief">${S.answered.length?S.answered.map(id=>{const[k,i]=id.split(':');const qq=SECTIONS.find(s=>s.k===k).q[+i];return `<p style="margin-bottom:14px"><span style="color:var(--ink3);font-size:11px;font-weight:600">MA</span><br>${qq[0]}<br><span style="color:var(--ink3);font-size:11px;font-weight:600">PATIENT</span><br>${qq[1]}</p>`;}).join(''):'<p style="color:var(--ink2)">No questions were checked during this visit.</p>'}</div>`;
+  app.innerHTML=`<div class="stage"><div class="body">
+   <div class="rail"><div class="lab">Session stats</div><div style="padding:0 8px">
+     <div class="stat"><span class="l">Time with patient</span><span class="v">${fmt(S.callSec||72)}</span></div>
+     <div class="stat"><span class="l">Questions answered</span><span class="v">${S.answered.length}/${TOTALQ}</span></div>
+     <div class="stat" style="border-bottom:0"><span class="l">Session score</span><span class="stt" style="background:var(--green-bg);color:var(--green-tx)">★ 5 Stars</span></div></div>
+    </div>
+   <div class="main"><div class="phead">
+     <div class="stab" id="stab"><button class="${S.sumTab==='brief'?'on':''}" data-t="brief">AI brief</button><button class="${S.sumTab==='transcript'?'on':''}" data-t="transcript">Transcript</button></div>
+     <div class="acts"><button class="btn" id="print">${ic('printer',16)} Print</button><button class="btn pri" id="return">Return to schedule</button></div></div>
+    ${S.sumTab==='brief'?brief:transcript}
+    <div class="note fxnote"><span class="ni">${ic('zap',15)}</span><span>On return, Flex sets you back to Ready and routes the next waiting patient — automatically.</span></div>
+   </div></div></div>`;
+  document.querySelectorAll('#stab button').forEach(b=>b.onclick=()=>{S.sumTab=b.dataset.t;render();});
+  document.getElementById('print').onclick=()=>toast('Sent to print');
+  document.getElementById('return').onclick=()=>{stop();S.screen='available';S.active=null;S.answered=[];S.aiRec=S.muted=S.hold=S.recPaused=false;toast('Back on your queue');render();};
+ }
+
+ if(S.screen==='startVisit'){
+  const p=P();
+  app.insertAdjacentHTML('beforeend',`<div class="scrim"><div class="modal">
+   <h2>Start new visit</h2><p class="lead">Verify patient details to start your Scope visit</p>
+   <div class="prev"><div><div class="l">Previous note</div><div class="s">August 5, 2025 · Signed by Dr. Alla</div></div><div class="chk">${ic('check',14)}</div></div>
+   <div class="note fxnote" style="margin:0 0 16px"><span class="ni">${ic('zap',15)}</span><span>Patient, phone and provider are pre-filled from the queue — the agent doesn't type anything.</span></div>
+   <div class="grid2">
+    <div class="fld"><label>Patient</label><div class="v ro">${p.nm}</div></div>
+    <div class="fld"><label>Phone number</label><div class="v ro">${p.phone}</div></div>
+    <div class="fld"><label>Sex</label><div class="v">${p.sex} ${ic('chevDown',16)}</div></div>
+    <div class="fld"><label>Date of birth</label><div class="v">${p.dob} ${ic('calendar',16)}</div></div>
+    <div class="fld"><label>Provider</label><div class="v">${p.prov} ${ic('chevDown',16)}</div></div>
+    <div class="fld"><label>Visit type</label><div class="v">${p.type} — Consult ${ic('chevDown',16)}</div></div></div>
+   <div class="mact"><button class="btn" id="back">Back to schedule</button><button class="btn pri" id="start">Start visit</button></div></div></div>`);
+  document.getElementById('start').onclick=()=>{S.screen='inVisit';S.visitStep='questions';S.appt=null;S.reschedule='';S.recReq=avsRecords().map(r=>({...r,status:'pending'}));S.aiRec=false;S.recSec=0;render();runCall();startRecTimer();};
+  document.getElementById('back').onclick=()=>{S.screen='available';render();};
+ }
+ if(S.modal==='endVisit'){
+  const R=[['Completed visit','Visit was successfully completed'],['Patient declined','Patient chose not to proceed'],['Reschedule appointment','Schedule a new visit time'],['Reschedule Scope call','Put the patient back in the queue'],['Other','']];
+  app.insertAdjacentHTML('beforeend',`<div class="scrim"><div class="modal"><h2>End visit</h2><p class="lead">Select your reason for ending the visit</p>
+   ${R.map((r,i)=>`<div class="reason ${S.reason===i?'sel':''}" data-r="${i}"><div class="rad"></div><div><div class="rt">${r[0]}</div>${r[1]?`<div class="rs">${r[1]}</div>`:''}</div></div>`).join('')}
+   <div class="note fxnote"><span class="ni">${ic('zap',15)}</span><span>Confirm saves the reason to the chart (Scope), then closes the call and frees you for the next patient (Flex) — one click.</span></div>
+   <div class="mact"><button class="btn" id="cancel">Cancel</button><button class="btn pri" id="confirm">Confirm</button></div></div></div>`);
+  document.querySelectorAll('.reason').forEach(r=>r.onclick=()=>{S.reason=+r.dataset.r;render();});
+  document.getElementById('cancel').onclick=()=>{S.modal=null;render();};
+  document.getElementById('confirm').onclick=()=>{S.modal=null;S.screen='summary';stop();render();};
+ }
+}
+
+function supervisor(){
+ const A=[
+  {name:'Dezaray Vasquez',status:'Talking to patient',code:'oncall',time:'3:11',calls:24,visits:19},
+  {name:'Franklin Ramirez',status:'Talking to patient',code:'oncall',time:'0:48',calls:19,visits:12},
+  {name:'Anna Calcetas',status:'Ready',code:'ready',time:'',calls:22,visits:18},
+  {name:'Amy Luna',status:'Talking to patient',code:'oncall',time:'1:52',calls:17,visits:14},
+  {name:'Oscar Cordova',status:'Ready',code:'ready',time:'',calls:16,visits:9},
+  {name:'Claudia Campos',status:'Ready',code:'ready',time:'',calls:21,visits:17},
+  {name:'Marielos Guevera',status:'On break',code:'break',time:'',calls:14,visits:9}
+ ];
+ const convPct=a=>a.calls?Math.round(a.visits/a.calls*100):0;
+ const convColor=p=>p>=78?'color:var(--green)':p<65?'color:var(--amber)':'color:var(--ink2)';
+ const stp={oncall:'background:#DDEBF1;color:#0C6E99',ready:'background:var(--green-bg);color:var(--green-tx)',break:'background:var(--amber-bg);color:var(--amber-tx)'};
+ const ready=A.filter(a=>a.code==='ready').length;
+ const oncall=A.filter(a=>a.code==='oncall').length;
+ const onbreak=A.filter(a=>a.code==='break').length;
+ const teamCalls=A.reduce((s,a)=>s+a.calls,0);
+ const teamVisits=A.reduce((s,a)=>s+a.visits,0);
+ const teamConv=teamCalls?Math.round(teamVisits/teamCalls*100):0;
+ const W=CALLBACKS.slice(0,6);
+ const statusLabel=a=>`${a.status}${a.time?' · '+a.time:''}`;
+ app.innerHTML=`<div class="stage"><div class="sup fz"><span class="ftag block"><span class="tdot"></span>Flex · live floor</span>
+  <div class="supTop">
+   <div><div class="greetEy">${todayLabel()}</div><h1 class="supGreet">${greeting()}, Marcus</h1><p class="sub">Live agent state for today. Deeper analytics and inbound service-level reporting live in Sigma.</p></div>
+   <div class="supActions"><button class="filterBtn" id="teamFilter">All agents ${ic('chevDown',14)}</button><button class="histBtn" id="recordingsBtn">${ic('clapper',16)} Recordings</button><button class="histBtn" id="sigmaBtn">${ic('barChart',16)} Analytics</button></div>
+  </div>
+  <div class="metricRows">
+   <div>
+    <div class="metricLabel">Team</div>
+    <div class="metricGrid">
+     <div class="metric"><p class="l">Ready</p><p class="v" style="color:var(--green)">${ready}</p><div class="hint">Available for the next call</div></div>
+     <div class="metric"><p class="l">Talking to patients</p><p class="v">${oncall}</p><div class="hint">Live on a patient call right now</div></div>
+     <div class="metric"><p class="l">On break</p><p class="v" style="color:var(--amber)">${onbreak}</p><div class="hint">Unavailable by choice</div></div>
+    </div>
+   </div>
+   <div>
+    <div class="metricLabel">Today</div>
+    <div class="metricGrid">
+     <div class="metric call"><p class="l">Visits completed</p><p class="v" style="color:var(--green)">${teamVisits}</p><div class="hint">Calls that turned into a visit</div></div>
+     <div class="metric call"><p class="l">Conversion</p><p class="v" style="${convColor(teamConv)}">${teamConv}%</p><div class="hint">Calls → visits across the team</div></div>
+     <div class="metric call"><p class="l">Avg inbound wait</p><p class="v">0:42</p><div class="hint">Answered inbound calls only</div></div>
+    </div>
+   </div>
+  </div>
+  <div class="supBody">
+   <div class="panel"><div class="panelHead"><div><h4>Agents</h4><p class="desc">Calls, completed visits and conversion give a quick read on each rep's day. One action: listen to live calls.</p></div></div>
+    <table class="agentTable"><thead><tr><th>Agent</th><th>Status</th><th>Calls today</th><th>Visits completed</th><th>Conversion</th><th style="text-align:right">Action</th></tr></thead><tbody>
+    ${A.map(a=>{const p=convPct(a);return `<tr><td><div class="agent">${avatar(a.name)}<span style="font-weight:500">${a.name}</span></div></td>
+     <td><span class="stt" style="${stp[a.code]}">${statusLabel(a)}</span></td>
+     <td><span class="callsNum">${a.calls}</span></td>
+     <td><span class="callsNum">${a.visits}</span></td>
+     <td><span class="callsNum" style="${convColor(p)}">${p}%</span></td>
+     <td style="text-align:right">${a.code==='oncall'?`<button class="listenBtn" data-a="Listening to ${a.name.split(' ')[0]}'s call">${ic('headphones',15)} Listen</button>`:`<button class="listenBtn" disabled>${ic('headphones',15)} Listen</button>`}</td></tr>`;}).join('')}
+    </tbody></table>
+   </div>
+   <div class="panel"><div class="panelHead"><div><h4>Inbound call queue</h4><p class="desc">Separate from agent state. This is only the live list of patients waiting for an inbound call to be answered.</p></div></div>
+    <table class="queueTable"><thead><tr><th>Patient</th><th>Wait</th><th>Language</th><th style="text-align:right">Action</th></tr></thead><tbody>
+    ${W.map((w,i)=>{const urgent=isUrgentWait(w.wait);return `<tr><td><div class="patientCell">${avatar(w.nm,34)}<div><div class="name">${w.nm}</div><div class="under">${w.prov} · ${w.type}</div></div></div></td>
+      <td><span class="waitText ${urgent?'long':''}">${w.wait}</span>${urgent?'<div style="margin-top:4px"><span class="tag urgent">Urgent</span></div>':''}</td>
+      <td>${w.skill==='es'?spanishBadge(w.skill):'<span class="meta">English</span>'}</td>
+      <td style="text-align:right"><button class="startScope ${urgent?'pri':''}" data-start="${i}">${ic('phoneIn',14)} Start Scope</button></td></tr>`;}).join('')}
+    </tbody></table>
+    <div class="superNote">Urgent is automatic after 2:00 waiting. I kept this queue below the agent table so it doesn't mix with Ready / On call / On break.</div>
+   </div>
+  </div></div></div>`;
+ document.getElementById('sigmaBtn').onclick=()=>{toast('Opening analytics in Sigma');window.open('https://app.sigmacomputing.com/','_blank','noopener');};
+ document.getElementById('recordingsBtn').onclick=()=>{toast('Opening call recordings in Twilio');window.open('https://console.twilio.com/','_blank','noopener');};
+ document.getElementById('teamFilter').onclick=()=>toast('Filter by pod or clinic');
+ document.querySelectorAll('.listenBtn:not([disabled])').forEach(m=>m.onclick=()=>toast(m.dataset.a));
+ document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{S.view='agent';S.qtab='inbound';S.active=CALLBACKS[+b.dataset.start];S.screen='startVisit';syncViewUI();render();});
+}
+
+
+
+function rtEmptyRow(t){return `<tr><td colspan="4" style="padding:28px 0;text-align:center;color:var(--ink3);font-size:13.5px">${t}</td></tr>`;}
+function rtEmptyMsg(t){return ({todo:'Nothing waiting to be started.',contacted:'Nothing in contacted right now.',awaiting:'Nothing awaiting records right now.',received:'No records received yet.',unsuccessful:'No unsuccessful records.'})[t]||'Nothing here.';}
+function retrieval(){
+ const counts={todo:0,contacted:0,awaiting:0,received:0,unsuccessful:0};
+ RETRIEVAL.forEach(r=>{counts[r.status]=(counts[r.status]||0)+1;});
+ const tab=S.rtab||'todo';
+ const cell=r=>`<div class="patientCell">${avatar(r.patient,34)}<div><div class="rtPatient">${r.justAdded?'<span class="newTag">New</span>':''}${r.patient}</div><div class="rtRec">${r.record}</div><div class="rtBy">Req. by ${r.by}</div></div></div>`;
+ const statusSel=r=>`<select class="statusSel s-${r.status}" data-status="${r.id}">${RT_STATUS.map(([v,l])=>`<option value="${v}" ${r.status===v?'selected':''}>${l}</option>`).join('')}</select>`;
+ const list=RETRIEVAL.filter(r=>r.status===tab);
+ const rows=list.length?list.map(r=>{
+   const c=contactInfo(r);
+   let sub='';
+   if(r.status==='received')sub=`<div class="rtSub">Filed to chart${r.done?' · '+r.done:''}</div>`;
+   else if(r.status==='unsuccessful')sub=`<div class="rtSub">${r.reason||'Unable to obtain'}</div>`;
+   else if(r.lastContact)sub=`<div class="rtSub">Last contact ${r.lastContact}${r.attempts?' · '+r.attempts+' attempt'+(r.attempts>1?'s':''):''}</div>`;
+   const srcCell=`<div class="rtSrcName">${r.source}</div><div class="rtContact"><span class="methodTag ${c.cls}">${ic(c.icon,11)} ${c.tag}</span><span>${c.line}</span></div>${sub}`;
+   const action=r.status==='received'?`<span class="rtDone">${ic('check',14)} Filed</span>`:`<button class="goBtn" data-contact="${r.id}">${ic(c.icon,13)} ${c.label}</button>`;
+   return `<tr><td>${cell(r)}</td><td>${srcCell}</td><td>${statusSel(r)}</td><td><div class="rtActs">${action}</div></td></tr>`;
+ }).join('') : rtEmptyRow(rtEmptyMsg(tab));
+ app.innerHTML=`<div class="stage"><div class="sup fz"><span class="ftag block"><span class="tdot"></span>Scope · record retrieval</span>
+  <div class="supTop">
+   <div><div class="greetEy">${todayLabel()}</div><h1 class="supGreet">${greeting()}, Lena</h1><p class="sub">Records the care team requested for upcoming visits. Call the clinic or pull each one from the provider portal, then set its status as you go.</p></div>
+  </div>
+  <div class="metricRows"><div><div class="metricLabel">Today</div>
+   <div class="metricGrid">
+    <div class="metric"><p class="l">Records retrieved</p><p class="v" style="color:var(--green)">${counts.received}</p><div class="hint">Received and filed to the chart</div></div>
+    <div class="metric"><p class="l">Awaiting records</p><p class="v" style="color:var(--amber)">${counts.awaiting}</p><div class="hint">Requested — waiting on the source</div></div>
+    <div class="metric"><p class="l">Unsuccessful</p><p class="v" style="color:var(--red)">${counts.unsuccessful}</p><div class="hint">No release on file or unreachable</div></div>
+   </div></div></div>
+  <div class="supBody"><div class="panel" style="overflow:visible">
+   <div class="ntabs" id="rtTabs">
+    ${RT_STATUS.map(([v,l,short])=>`<button class="${tab===v?'on':''}" data-t="${v}">${short} <span class="c">${counts[v]}</span></button>`).join('')}
+   </div>
+   <table class="queueTable"><thead><tr><th>Patient · record</th><th>Source & contact</th><th>Status</th><th style="text-align:right">Action</th></tr></thead><tbody>${rows}</tbody></table>
+   <div class="superNote">Set each record's status as you work it: To do → Contacted → Awaiting records → Received or Unsuccessful. The tabs above switch the view by status. Records requested by call agents during a visit arrive in To do, tagged New.</div>
+  </div></div>
+ </div></div>`;
+ document.querySelectorAll('#rtTabs button').forEach(b=>b.onclick=()=>{S.rtab=b.dataset.t;render();});
+ document.querySelectorAll('[data-contact]').forEach(b=>b.onclick=()=>contactSource(b.dataset.contact));
+ document.querySelectorAll('.statusSel').forEach(sel=>sel.onchange=()=>{const r=RETRIEVAL.find(x=>x.id===sel.dataset.status);if(r){r.status=sel.value;if(sel.value==='received'&&!r.done)r.done='Just now';if((sel.value==='contacted'||sel.value==='awaiting')&&!r.lastContact)r.lastContact='Just now';toast(r.patient.split(' ')[0]+' — '+RT_STATUS.find(s=>s[0]===sel.value)[1]);}render();});
+}
+
+function render(){
+ document.body.classList.toggle('fx',S.fx);
+ if(S.view==='agent')agent();else if(S.view==='supervisor')supervisor();else retrieval();
+}
+const VIEW_LABELS={agent:'Agent',supervisor:'Manager',retrieval:'Retrieval'};
+const viewFab=document.getElementById('viewFab'),viewMenu=document.getElementById('viewMenu'),viewScrim=document.getElementById('viewScrim');
+function openViewMenu(o){viewMenu.hidden=!o;viewScrim.hidden=!o;viewFab.classList.toggle('open',o);viewFab.setAttribute('aria-expanded',o?'true':'false');}
+function syncViewUI(){document.querySelectorAll('#viewMenu .vmItem').forEach(x=>x.classList.toggle('on',x.dataset.role===S.view));document.getElementById('vfLabel').textContent=VIEW_LABELS[S.view];}
+viewFab.onclick=()=>openViewMenu(viewMenu.hidden);
+viewScrim.onclick=()=>openViewMenu(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')openViewMenu(false);});
+document.querySelectorAll('#viewMenu .vmItem').forEach(b=>b.onclick=()=>{S.view=b.dataset.role;document.querySelectorAll('#viewMenu .vmItem').forEach(x=>x.classList.toggle('on',x===b));document.getElementById('vfLabel').textContent=VIEW_LABELS[S.view];openViewMenu(false);render();});
+document.getElementById('fxTog').onclick=()=>{S.fx=!S.fx;document.getElementById('fxSw').classList.toggle('on',S.fx);render();};
+document.getElementById('resetBtn').onclick=()=>{stop();RETRIEVAL=seedRetrieval();const v=S.view,f=S.fx;S=fresh();S.view=v;S.fx=f;render();};
+render();
+</script>
+</body>
+</html>
