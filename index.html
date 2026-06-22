@@ -106,7 +106,7 @@ svg{display:block;}
 .foot .icb{color:var(--ink3);padding:4px;border-radius:6px;transition:.13s;}
 .foot .icb:hover{background:#EDEDEE;color:var(--ink2);}
 
-.main{padding:42px 36px 26px;}
+.main{padding:60px 36px 26px;}
 .phead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
 .pname{display:flex;align-items:center;gap:13px;}
 .pname .n{font-size:16px;font-weight:600;}
@@ -187,6 +187,7 @@ svg{display:block;}
 .ntag.pomona{background:#DDEBF1;color:#0C6E99;}
 .ntag.rhode{background:#DDEDEA;color:#0E7B6C;}
 .ntag.street{background:#EAE3F2;color:#693FA5;}
+.ntag.lang{background:#E7E8F4;color:#585CA0;}
 .ntag.amber{background:#FAEBDD;color:#D9730B;}
 .ntag.slate{background:#EBECED;color:#57575C;}
 .ntag.gray{background:#EBECED;color:#57575C;}
@@ -293,7 +294,7 @@ svg{display:block;}
 .brief p{font-size:14px;line-height:1.75;color:#3A3A3D;margin:0;}
 .term{background:var(--chip-bg);color:var(--chip-tx);padding:1px 6px;border-radius:5px;font-weight:500;white-space:nowrap;}
 
-.sup{padding:42px 36px 26px;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.sup{padding:60px 36px 26px;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
 .sup .h{font-size:18px;font-weight:600;letter-spacing:-.015em;margin:2px 0 4px;}
 .sup .sub{font-size:13.5px;color:var(--ink2);margin:0;}
@@ -331,7 +332,7 @@ th.num,td.num{text-align:right;}
 .mon{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);color:var(--ink3);display:inline-flex;align-items:center;justify-content:center;margin-left:6px;transition:.14s var(--ease);}
 .mon:hover{border-color:var(--ink3);color:var(--ink);background:var(--surface);}
 
-.sup{padding:42px 36px 26px;overflow:auto;}
+.sup{padding:60px 36px 26px;overflow:auto;}
 .supTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px;}
 .supGreet{font-size:28px;font-weight:700;letter-spacing:-.03em;margin:0 0 8px;line-height:1.1;}
 .sup .h{font-size:20px;font-weight:600;letter-spacing:-.018em;margin:0 0 4px;}
@@ -483,6 +484,59 @@ body:not(.fx) .fxnote{display:none;}
 .vtog button{font-size:13.5px;font-weight:500;color:var(--ink3);padding:0 0 10px;margin-bottom:-1px;border-bottom:2px solid transparent;transition:.14s var(--ease);}
 .vtog button:hover{color:var(--ink2);}
 .vtog button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink);}
+
+/* ── agent personal dashboard ── */
+.agentStats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+.aStat{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:15px 16px;}
+.aStat .l{font-size:12px;color:var(--ink2);margin:0;display:flex;align-items:center;gap:7px;}
+.aStat .l svg{color:var(--ink3);}
+.aStat .v{font-size:25px;font-weight:600;letter-spacing:-.02em;margin:9px 0 0;}
+.aStat .hint{font-size:11.5px;color:var(--ink3);margin-top:5px;}
+.aProgress{height:6px;border-radius:6px;background:#E7E7EA;overflow:hidden;margin-top:10px;}
+.aProgress i{display:block;height:100%;border-radius:6px;background:var(--blue);transition:width .4s var(--ease);}
+
+/* ── in-visit progress (rail) ── */
+.railProg{margin:0 8px 16px;}
+.railProg .top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
+.railProg .pl{font-size:12.5px;font-weight:600;color:var(--ink);}
+.railProg .pc{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums;}
+.railProg .bar{height:7px;border-radius:7px;background:#E7E7EA;overflow:hidden;}
+.railProg .bar i{display:block;height:100%;border-radius:7px;background:var(--green);transition:width .35s var(--ease);}
+
+/* ── weighty record control ── */
+.recBtn{font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:9px;border:1px solid #E7B9B5;background:var(--red-soft);color:var(--red);display:inline-flex;align-items:center;gap:8px;transition:.14s var(--ease);}
+.recBtn:hover{border-color:var(--red);background:#FCE0DD;}
+.recBtn:active{transform:scale(.98);}
+
+/* ── manager hero metrics ── */
+.heroRow{display:grid;grid-template-columns:1.55fr 1fr;gap:16px;margin-bottom:28px;}
+.heroCard{border:1px solid var(--line);border-radius:15px;background:#fff;padding:22px 24px;display:flex;flex-direction:column;justify-content:center;}
+.heroCard .hl{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin:0;}
+.heroCard .hv{font-size:46px;font-weight:700;letter-spacing:-.03em;line-height:1;margin:12px 0 0;color:var(--ink);}
+.heroCard .hsub{font-size:13px;color:var(--ink2);margin-top:11px;}
+.heroCard .hsub b{color:var(--ink);font-weight:600;}
+.heroBar{height:7px;border-radius:7px;background:#DCEAE5;overflow:hidden;margin-top:15px;}
+.heroBar i{display:block;height:100%;border-radius:7px;background:var(--green);}
+.heroSupport{display:grid;grid-template-columns:1fr;gap:14px;}
+.miniStat{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;justify-content:center;}
+.miniStat .l{font-size:12px;color:var(--ink2);margin:0;}
+.miniStat .v{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:7px 0 0;}
+.miniStat .vUnit{font-size:14px;font-weight:500;color:var(--ink3);}
+.miniStat .hint{font-size:11.5px;color:var(--ink3);margin-top:5px;}
+@media(max-width:780px){.agentStats{grid-template-columns:repeat(2,1fr);}.heroRow{grid-template-columns:1fr;}}
+
+/* ── inbound/outbound visit mix (split bar + legend, used in hero) ── */
+.splitBar{display:flex;height:11px;border-radius:6px;overflow:hidden;gap:2px;}
+.splitBar .seg{height:100%;border-radius:3px;transition:flex-basis .4s var(--ease);}
+.splitBar .seg.out{background:var(--blue);}
+.splitBar .seg.in{background:#C5CAD2;}
+.vmLegend{display:flex;gap:22px;flex-wrap:wrap;}
+.vmLegend .li{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);}
+.vmLegend .ld{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.vmLegend .ld.out{background:var(--blue);}
+.vmLegend .ld.in{background:#C5CAD2;}
+.vmLegend b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;}
+.vSplit{font-size:11.5px;color:var(--ink3);margin-top:3px;font-variant-numeric:tabular-nums;}
 </style>
 </head>
 <body>
@@ -534,10 +588,10 @@ barChart:'<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/>
 };
 function ic(n,s,c){return `<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;}
 function twilioIcon(s){const z=s||16;return `<svg width="${z}" height="${z}" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#F22F46"/><circle cx="11" cy="11" r="2.7" fill="#fff"/><circle cx="21" cy="21" r="2.7" fill="#fff"/><circle cx="21" cy="11" r="2.7" fill="#fff"/><circle cx="11" cy="21" r="2.7" fill="#fff"/></svg>`;}
-const AVC=[['#DDEBF1','#0C6E99'],['#FAEBDD','#D9730B'],['#DDEDEA','#0E7B6C'],['#EAE3F2','#693FA5'],['#F4DFEB','#AD1972'],['#FBF3DA','#DFAB00']];
+const AVC=[['#E5EDF3','#557690'],['#E3EDEA','#5A847A'],['#F0EAE1','#8C7660']];
 function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
 function avc(n){let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%AVC.length;return AVC[h];}
-function avatar(n,sz){const[bg,fg]=avc(n);return `<span class="av" style="width:${sz||32}px;height:${sz||32}px;border-radius:50%;font-size:${(sz||32)<34?'11.5px':'13px'};background:${bg};color:${fg}">${initials(n)}</span>`;}
+function avatar(n,sz,mono){const[bg,fg]=mono?['#EBECED','#57575C']:avc(n);return `<span class="av" style="width:${sz||32}px;height:${sz||32}px;border-radius:50%;font-size:${(sz||32)<34?'11.5px':'13px'};background:${bg};color:${fg}">${initials(n)}</span>`;}
 
 const SECTIONS=[
 {k:'hpi',n:'HPI',q:[
@@ -683,7 +737,7 @@ const MKT={'Pomona':'pomona','Rhode Island':'rhode','Street Med':'street'};
 function mkt(m){return `<span class="ntag ${MKT[m]||'gray'}">${m}</span>`;}
 function langtag(s){return `<span class="lbl"><span class="ldot ${s}"></span>${lang(s)}</span>`;}
 function langChip(s){return `<span class="ntag ${s==='es'?'amber':'slate'}">${lang(s)}</span>`;}
-function spanishBadge(s){return s==='es'?'<span class="ntag amber">Spanish</span>':'';}
+function spanishBadge(s){return s==='es'?'<span class="ntag lang">Spanish</span>':'';}
 function waitSeconds(t){const [m='0',s='0']=String(t).split(':');return (parseInt(m,10)||0)*60+(parseInt(s,10)||0);}
 function isUrgentWait(t){return waitSeconds(t)>120;}
 function vtag(t){return `<span class="ntag gray">${t}</span>`;}
@@ -709,7 +763,10 @@ items+=`<div class="qi ${full?'full':''}"><span class="qiLabel ${full?'struck':'
 let tr='';
 S.answered.forEach(id=>{const[k,i]=id.split(':');const sec=SECTIONS.find(s=>s.k===k);if(sec){const qq=sec.q[+i];tr+=`<p class="who">MA</p><p class="q">${qq[0]}</p><p class="who">PATIENT</p><p class="q">${qq[1]}</p>`;}});
 if(!tr)tr='<p class="ph">Recording will transcribe the call here…</p>';
-return `<div class="rail"><div class="lab">Questions</div>${items}   <div class="tr"><div class="lab" style="margin-left:0">Transcript</div>${tr}</div></div>`;
+const totalAns=S.answered.length;
+const pct=Math.round(totalAns/TOTALQ*100);
+const prog=`<div class="railProg"><div class="top"><span class="pl">Pre-visit progress</span><span class="pc">${totalAns}/${TOTALQ}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+return `<div class="rail">${prog}<div class="lab">Questions</div>${items}   <div class="tr"><div class="lab" style="margin-left:0">Transcript</div>${tr}</div></div>`;
 }
 function questions(){
 return SECTIONS.map(s=>{
@@ -750,7 +807,7 @@ return QUEUE.map((p,i)=>`<div class="qr">${avatar(p.nm,38)}   <div class="mid"><
 
 function agent(){
 if(S.screen==='available'){
-app.innerHTML=`<div class="stage"><div class="main homeMain">    <div class="greet">     <div>      <div class="greetEy">${todayLabel()}</div>      <h1>${greeting()}, Amy</h1>      <p class="greetSub"><b>${QUEUE.length}</b> outbound calls to make · <b>${CALLBACKS.length}</b> waiting inbound</p>     </div>     <div class="statusWrap"><span class="statusLab">Status</span><button class="status ${S.status==='Ready'?'avail':'brk'}" id="statusBtn"><span class="sd"></span>${S.status} ${ic('chevDown',15)}</button></div>    </div>    <div class="fz"><span class="ftag block"><span class="tdot"></span>Flex · queue</span>     <div class="queue">      <div class="qtabs" id="qtabs">       <button class="qtab ${S.qtab==='outbound'?'on':''}" data-t="outbound">${ic('phoneOut',15)} Outbound <span class="c">${QUEUE.length}</span></button>       <button class="qtab ${S.qtab==='inbound'?'on':''}" data-t="inbound">${ic('phoneIn',15)} Inbound <span class="c">${CALLBACKS.length}</span></button>      </div>      <div class="qlist">${queueRows()}</div>     </div>    </div>   </div></div>`;
+app.innerHTML=`<div class="stage"><div class="main homeMain">    <div class="greet">     <div>      <div class="greetEy">${todayLabel()}</div>      <h1>${greeting()}, Amy</h1>      <p class="greetSub"><b>${QUEUE.length}</b> outbound calls to make · <b>${CALLBACKS.length}</b> waiting inbound</p>     </div>     <div class="statusWrap"><span class="statusLab">Status</span><button class="status ${S.status==='Ready'?'avail':'brk'}" id="statusBtn"><span class="sd"></span>${S.status} ${ic('chevDown',15)}</button></div>    </div>    ${(()=>{const myCalls=17,myVisits=14,myConv=Math.round(myVisits/myCalls*100),myAvg='4:12',planned=myCalls+QUEUE.length,donePct=Math.round(myCalls/planned*100);return `<div class="agentStats"><div class="aStat"><p class="l">${ic('phoneOut',14)} Calls today</p><p class="v">${myCalls}</p><div class="aProgress"><i style="width:${donePct}%"></i></div><div class="hint">${QUEUE.length} left in your queue</div></div><div class="aStat"><p class="l">${ic('check',14)} Visits completed</p><p class="v" style="color:var(--green)">${myVisits}</p><div class="hint">Calls that became a visit</div></div><div class="aStat"><p class="l">${ic('zap',14)} Conversion</p><p class="v">${myConv}%</p><div class="hint">Above the team average</div></div><div class="aStat"><p class="l">${ic('clock',14)} Avg call time</p><p class="v">${myAvg}</p><div class="hint">Per completed visit</div></div></div>`;})()}    <div class="fz"><span class="ftag block"><span class="tdot"></span>Flex · queue</span>     <div class="queue">      <div class="qtabs" id="qtabs">       <button class="qtab ${S.qtab==='outbound'?'on':''}" data-t="outbound">${ic('phoneOut',15)} Outbound <span class="c">${QUEUE.length}</span></button>       <button class="qtab ${S.qtab==='inbound'?'on':''}" data-t="inbound">${ic('phoneIn',15)} Inbound <span class="c">${CALLBACKS.length}</span></button>      </div>      <div class="qlist">${queueRows()}</div>     </div>    </div>   </div></div>`;
 document.querySelectorAll('#qtabs .qtab').forEach(b=>b.onclick=()=>{S.qtab=b.dataset.t;render();});
 document.getElementById('statusBtn').onclick=()=>{S.status=S.status==='Ready'?'On break':'Ready';toast('Status set to '+S.status);render();};
 document.querySelectorAll('[data-call]').forEach(b=>b.onclick=()=>{S.active=(S.qtab==='inbound'?CALLBACKS:QUEUE)[+b.dataset.call];S.screen='startVisit';render();});
@@ -760,7 +817,7 @@ const p=P();
 const onAppt=S.visitStep==='appt';
 const recUI=S.aiRec
 ?`<div class="recWrap"><button class="btn recOn" id="rec"><span class="recdot"></span> Stop recording</button><span class="soundWave">${Array.from({length:18},(_,i)=>`<span class="sw-bar" style="animation-delay:${(i%6)*0.11}s"></span>`).join('')}</span></div>`
-   :`<button class="btn" id="rec">${ic('mic',16)} Record</button>`;   const mainContent=onAppt?apptPanel():questions();   app.innerHTML=`<div class="stage">${strip()}<div class="body">${rail()}<div class="main visitMain">
+   :`<button class="recBtn" id="rec">${ic('mic',17)} Record</button>`;   const mainContent=onAppt?apptPanel():questions();   app.innerHTML=`<div class="stage">${strip()}<div class="body">${rail()}<div class="main visitMain">
 <div class="phead"><div class="pname"><span class="n">${p.nm}</span><span class="div"></span><span class="m">${p.sex} · ${p.dob} ·${p.age}</span></div>
 <div class="acts">${recUI}<button class="btn" id="end">End visit</button></div></div>
    <div class="vtog" id="visitTabs"><button class="${onAppt?'':'on'}" data-vt="questions">Questions</button><button class="${onAppt?'on':''}" data-vt="appt">Admin</button></div>
@@ -810,13 +867,13 @@ document.getElementById('confirm').onclick=()=>{S.modal=null;S.screen='summary';
 
 function supervisor(){
 const A=[
-{name:'Dezaray Vasquez',status:'Talking to patient',code:'oncall',time:'3:11',calls:24,visits:19},
-{name:'Franklin Ramirez',status:'Talking to patient',code:'oncall',time:'0:48',calls:19,visits:12},
-{name:'Anna Calcetas',status:'Ready',code:'ready',time:'',calls:22,visits:18},
-{name:'Amy Luna',status:'Talking to patient',code:'oncall',time:'1:52',calls:17,visits:14},
-{name:'Oscar Cordova',status:'Ready',code:'ready',time:'',calls:16,visits:9},
-{name:'Claudia Campos',status:'Ready',code:'ready',time:'',calls:21,visits:17},
-{name:'Marielos Guevera',status:'On break',code:'break',time:'',calls:14,visits:9}
+{name:'Dezaray Vasquez',status:'Talking to patient',code:'oncall',time:'3:11',calls:24,visits:19,obV:12,ibV:7},
+{name:'Franklin Ramirez',status:'Talking to patient',code:'oncall',time:'0:48',calls:19,visits:12,obV:8,ibV:4},
+{name:'Anna Calcetas',status:'Ready',code:'ready',time:'',calls:22,visits:18,obV:11,ibV:7},
+{name:'Amy Luna',status:'Talking to patient',code:'oncall',time:'1:52',calls:17,visits:14,obV:9,ibV:5},
+{name:'Oscar Cordova',status:'Ready',code:'ready',time:'',calls:16,visits:9,obV:6,ibV:3},
+{name:'Claudia Campos',status:'Ready',code:'ready',time:'',calls:21,visits:17,obV:10,ibV:7},
+{name:'Marielos Guevera',status:'On break',code:'break',time:'',calls:14,visits:9,obV:6,ibV:3}
 ];
 const convPct=a=>a.calls?Math.round(a.visits/a.calls*100):0;
 const convColor=p=>p>=78?'color:var(--green)':p<65?'color:var(--amber)':'color:var(--ink2)';
@@ -826,20 +883,24 @@ const oncall=A.filter(a=>a.code==='oncall').length;
 const onbreak=A.filter(a=>a.code==='break').length;
 const teamCalls=A.reduce((s,a)=>s+a.calls,0);
 const teamVisits=A.reduce((s,a)=>s+a.visits,0);
+const teamObV=A.reduce((s,a)=>s+a.obV,0);
+const teamIbV=A.reduce((s,a)=>s+a.ibV,0);
+const obPct=teamVisits?Math.round(teamObV/teamVisits*100):0;
+const ibPct=100-obPct;
 const teamConv=teamCalls?Math.round(teamVisits/teamCalls*100):0;
 const W=CALLBACKS.slice(0,6);
 const statusLabel=a=>`${a.status}${a.time?' · '+a.time:''}`;
-app.innerHTML=`<div class="stage"><div class="sup fz"><span class="ftag block"><span class="tdot"></span>Flex · live floor</span>   <div class="supTop">    <div><div class="greetEy">${todayLabel()}</div><h1 class="supGreet">${greeting()}, Marcus</h1><p class="sub">Live agent state for today. Deeper analytics and inbound service-level reporting live in Sigma.</p></div>    <div class="supActions"><div style="position:relative"><button class="filterBtn" id="teamFilter">${S.mktFilter||'All agents'} ${ic('chevDown',14)}</button></div><button class="histBtn" id="recordingsBtn">${ic('clapper',16)} Recordings</button><button class="histBtn" id="sigmaBtn">${ic('barChart',16)} Analytics</button></div>   </div>   <div class="metricRows">    <div>     <div class="metricLabel">Team</div>     <div class="metricGrid">      <div class="metric"><p class="l">Ready</p><p class="v" style="color:var(--green)">${ready}</p><div class="hint">Available for the next call</div></div>      <div class="metric"><p class="l">Talking to patients</p><p class="v">${oncall}</p><div class="hint">Live on a patient call right now</div></div>      <div class="metric"><p class="l">On break</p><p class="v" style="color:var(--amber)">${onbreak}</p><div class="hint">Unavailable by choice</div></div>     </div>    </div>    <div>     <div class="metricLabel">Today</div>     <div class="metricGrid">      <div class="metric call"><p class="l">Visits completed</p><p class="v" style="color:var(--green)">${teamVisits}</p><div class="hint">Calls that turned into a visit</div></div>      <div class="metric call"><p class="l">Conversion</p><p class="v" style="${convColor(teamConv)}">${teamConv}%</p><div class="hint">Calls → visits across the team</div></div>      <div class="metric call"><p class="l">Avg inbound wait</p><p class="v">0:42</p><div class="hint">Answered inbound calls only</div></div>     </div>    </div>   </div>   <div class="supBody">    <div class="panel"><div class="panelHead"><div><h4>Agents</h4><p class="desc">Calls, completed visits and conversion give a quick read on each rep's day. One action: listen to live calls.</p></div></div>     <table class="agentTable"><thead><tr><th>Agent</th><th>Status</th><th>Calls today</th><th>Visits completed</th><th>Conversion</th><th style="text-align:right">Action</th></tr></thead><tbody>     ${A.map(a=>{const p=convPct(a);return` <tr><td><div class="agent">${avatar(a.name)}<span style="font-weight:500">${a.name}</span></div></td>
+app.innerHTML=`<div class="stage"><div class="sup fz"><span class="ftag block"><span class="tdot"></span>Flex · live floor</span>   <div class="supTop">    <div><div class="greetEy">${todayLabel()}</div><h1 class="supGreet">${greeting()}, Marcus</h1><p class="sub">Live agent state for today. Deeper analytics and inbound service-level reporting live in Sigma.</p></div>    <div class="supActions"><div style="position:relative"><button class="filterBtn" id="teamFilter">${S.mktFilter||'All agents'} ${ic('chevDown',14)}</button></div><button class="histBtn" id="recordingsBtn">${ic('clapper',16)} Recordings</button><button class="histBtn" id="sigmaBtn">${ic('barChart',16)} Analytics</button></div>   </div>   <div class="heroRow">    <div class="heroCard"><p class="hl">Today's conversion</p><p class="hv">${teamConv}%</p><p class="hsub"><b>${teamVisits}</b> visits booked from <b>${teamCalls}</b> calls</p><div class="splitBar" style="margin-top:16px"><div class="seg out" style="flex:${teamObV}"></div><div class="seg in" style="flex:${teamIbV}"></div></div><div class="vmLegend" style="margin-top:11px"><span class="li"><span class="ld out"></span>Outbound <b>${teamObV}</b> · ${obPct}%</span><span class="li"><span class="ld in"></span>Inbound <b>${teamIbV}</b> · ${ibPct}%</span></div></div>    <div class="heroSupport"><div class="miniStat"><p class="l">On the floor</p><p class="v" style="color:var(--green)">${ready} <span class="vUnit">ready</span></p><div class="hint">${oncall} on call · ${onbreak} on break</div></div><div class="miniStat"><p class="l">Avg inbound wait</p><p class="v">0:42</p><div class="hint">Answered calls today</div></div></div>   </div>   <div class="supBody">    <div class="panel"><div class="panelHead"><div><h4>Agents</h4><p class="desc">Calls, completed visits and conversion give a quick read on each rep's day. One action: listen to live calls.</p></div></div>     <table class="agentTable"><thead><tr><th>Agent</th><th>Status</th><th>Calls today</th><th>Visits completed</th><th>Conversion</th><th style="text-align:right">Action</th></tr></thead><tbody>     ${A.map(a=>{const p=convPct(a);return` <tr><td><div class="agent">${avatar(a.name,32,true)}<span style="font-weight:500">${a.name}</span></div></td>
 <td><span class="stt" style="${stp[a.code]}">${statusLabel(a)}</span></td>
 <td><span class="callsNum">${a.calls}</span></td>
-     <td><span class="callsNum">${a.visits}</span></td>
+     <td><span class="callsNum">${a.visits}</span><div class="vSplit">${a.obV} out · ${a.ibV} in</div></td>
 <td><span class="callsNum" style="${convColor(p)}">${p}%</span></td>
 <td style="text-align:right">${a.code==='oncall'?`<button class="listenBtn" data-a="Listening to ${a.name.split(' ')[0]}'s call">${ic('headphones',15)} Listen</button>`:`<button class="listenBtn" disabled>${ic('headphones',15)} Listen</button>`}</td></tr>`;}).join('')}
 </tbody></table>
 </div>
 <div class="panel"><div class="panelHead"><div><h4>Inbound call queue</h4><p class="desc">Separate from agent state. This is only the live list of patients waiting for an inbound call to be answered.</p></div></div>
 <table class="queueTable"><thead><tr><th>Patient</th><th>Wait</th><th>Language</th><th style="text-align:right">Action</th></tr></thead><tbody>
-${W.map((w,i)=>{const urgent=isUrgentWait(w.wait);return `<tr><td><div class="patientCell">${avatar(w.nm,34)}<div><div class="name">${w.nm}</div><div class="under">${w.prov} · ${w.type}</div></div></div></td>
+${W.map((w,i)=>{const urgent=isUrgentWait(w.wait);return `<tr><td><div class="patientCell">${avatar(w.nm,34,true)}<div><div class="name">${w.nm}</div><div class="under">${w.prov} · ${w.type}</div></div></div></td>
       <td><span class="waitText ${urgent?'long':''}">${w.wait}</span>${urgent?'<div style="margin-top:4px"><span class="tag urgent">Urgent</span></div>':''}</td>
 <td>${w.skill==='es'?spanishBadge(w.skill):'<span class="meta">English</span>'}</td>
       <td style="text-align:right"><button class="startScope ${urgent?'pri':''}" data-start="${i}">${ic('phoneIn',14)} Start Scope</button></td></tr>`;}).join('')}     </tbody></table>     <div class="superNote">Urgent is automatic after 2:00 waiting. I kept this queue below the agent table so it doesn't mix with Ready / On call / On break.</div>    </div>   </div></div></div>`;
@@ -861,7 +922,7 @@ function retrieval(){
 const counts={todo:0,contacted:0,awaiting:0,received:0,unsuccessful:0};
 RETRIEVAL.forEach(r=>{counts[r.status]=(counts[r.status]||0)+1;});
 const tab=S.rtab||'todo';
-const cell=r=>`<div class="patientCell">${avatar(r.patient,34)}<div><div class="rtPatient">${r.justAdded?'<span class="newTag">New</span>':''}${r.patient}</div><div class="rtRec">${r.record}</div><div class="rtBy">Req. by ${r.by}</div></div></div>`;
+const cell=r=>`<div class="patientCell">${avatar(r.patient,34,true)}<div><div class="rtPatient">${r.justAdded?'<span class="newTag">New</span>':''}${r.patient}</div><div class="rtRec">${r.record}</div><div class="rtBy">Req. by ${r.by}</div></div></div>`;
 const statusSel=r=>`<select class="statusSel s-${r.status}" data-status="${r.id}">${RT_STATUS.map(([v,l])=>`<option value="${v}"${r.status===v?'selected':''}>${l}</option>`).join('')}</select>`;
  const list=RETRIEVAL.filter(r=>r.status===tab);
  const rows=list.length?list.map(r=>{
